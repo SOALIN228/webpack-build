@@ -11,7 +11,12 @@ module.exports = {
     rules: [{
       test: /\.(png|svg|jpg|gif)$/, // 图片格式
       use: {
-        loader: 'file-loader' // 使用file-loader打包图片
+        loader: 'url-loader', // 使用url-loader打包图片
+        options: {
+          name: '[name]_[hash].[ext]', // 配置打包后的名字 ext为文件扩展名
+          outputPath: 'images/', // 输出路径
+          limit: 20480
+        }
       }
     }]
   }

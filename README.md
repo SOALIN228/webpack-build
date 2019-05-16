@@ -56,12 +56,22 @@ module.exports = {
 
 使用各种不同的 loader 就可以让 webpack 支持各种资源的打包
 
+
+
+### 打包图片
+
+url-loader 和 file-loader 功能相似，区别是 url-loader 可以指定当图片小于设置参数时，使用base64打包
+
 ```javascript
 rules: [{
   test: /\.(png|svg|jpg|gif)$/, // 图片格式
   use: {
-    loader: 'file-loader' // 使用file-loader支持打包图片
+    loader: 'url-loader', // 使用url-loader打包图片
+    options: {
+      name: '[name]_[hash].[ext]', // 配置打包后的名字 ext为文件扩展名
+      outputPath: 'images/', // 输出路径
+      limit: 20480
+    }
   }
 }]
 ```
-
