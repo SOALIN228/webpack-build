@@ -5,19 +5,19 @@
 
 全局安装
 
-```javascript
+```bash
 npm install webpack webpack-cli -g
 ```
 
 项目安装
 
-```javascript
+```bash
 npm install webpack webpack-cli -D
 ```
 
 不使用全局安装，使用 npx 查看项目的版本
 
-```javascript
+```bash
 npx webpack -v
 ```
 
@@ -42,7 +42,7 @@ module.exports = {
 
 在 package.json 文件中为 scripts 添加
 
-```javascript
+```bash
 "bundle": "webpack"
 ```
 
@@ -60,18 +60,74 @@ module.exports = {
 
 ### 打包图片
 
+```bash
+npm install --save-dev file-loader url-loader
+```
+
 url-loader 和 file-loader 功能相似，区别是 url-loader 可以指定当图片小于设置参数时，使用base64打包
 
-```javascript
-rules: [{
+```
+{
   test: /\.(png|svg|jpg|gif)$/, // 图片格式
-  use: {
+  use: [{
     loader: 'url-loader', // 使用url-loader打包图片
     options: {
       name: '[name]_[hash].[ext]', // 配置打包后的名字 ext为文件扩展名
       outputPath: 'images/', // 输出路径
       limit: 20480
     }
-  }
-}]
+  }]
+}
+```
+
+
+
+### 打包CSS
+
+style-loader css-loader 支持打包 css
+
+```bash
+npm install style-loader css-loader -D
+```
+
+sass-loader 支持打包 sass
+
+```bash
+npm install sass-loader node-sass -D
+```
+
+postcss-loader 可以安装插件
+
+```bash
+npm i postcss-loader -D
+```
+
+自动生成厂商前缀
+
+```bash
+npm install autoprefixer -D
+```
+
+在 postcss.config.js 文件配置 autoprefixer
+
+```javascript
+module.exports = {
+  plugins: [
+    require('autoprefixer')
+  ]
+}
+```
+
+loader 配置
+
+```javascript
+{
+  test: /\.scss$/,
+  use: [
+    'style-loader',
+    'css-loader', // 打包css
+    'postcss-loader', // 支持插件
+    'sass-loader', // 打包sass
+  ]
+}
 ```
