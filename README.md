@@ -21,3 +21,30 @@ npm install webpack webpack-cli -D
 npx webpack -v
 ```
 
+
+
+## 配置
+
+在 webpack.config.js 文件中配置
+
+```javascript
+const path = require('path')
+
+module.exports = {
+  mode: 'production', // 打包格式，是否压缩
+  entry: './src/index.js', // 入口文件
+  output: { // 出口文件
+    filename: 'bundle.js', // 输出文件名
+    path: path.resolve(__dirname, 'dist') // 输出文件路径 __dirname为webpack.config当前文件
+  }
+}
+```
+
+在 package.json 文件中为 scripts 添加
+
+```javascript
+"bundle": "webpack"
+```
+
+可以直接使用 npm run bundle 打包，手动命令为 npx webpack
+
