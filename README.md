@@ -48,3 +48,20 @@ module.exports = {
 
 可以直接使用 npm run bundle 打包，手动命令为 npx webpack
 
+
+
+## Loader
+
+在 webpack.config.js 文件 module 中配置
+
+使用各种不同的 loader 就可以让 webpack 支持各种资源的打包
+
+```javascript
+rules: [{
+  test: /\.(png|svg|jpg|gif)$/, // 图片格式
+  use: {
+    loader: 'file-loader' // 使用file-loader支持打包图片
+  }
+}]
+```
+
