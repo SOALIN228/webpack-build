@@ -1,9 +1,8 @@
-import bgImg from './bgImg.jpg'
+import creatImg from './creatImg'
 import './index.scss'
 
-let img = new Image()
-img.src = bgImg
-img.classList.add('bgImg')
+// creatImg()
+
 
 let root = document.getElementById('root')
-root.append(img)
+root.innerHTML = `<div class="iconfont icon-check-circle">abc</div>`
