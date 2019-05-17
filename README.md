@@ -48,7 +48,7 @@ module.exports = {
 
 
 
-## devtool
+### devtool
 
 因为代码出错显示的是打包后文件的位置，使用 devtool 配置 source-map 即可显示源文件的出错位置，devtool 会自动帮我们把打包位置文件位置映射到源文件位置
 
@@ -69,7 +69,7 @@ devtool: 'cheap-module-source-map', // 生产环境配置 production
 
 
 
-### 添加 npm 命令
+### 打包命令
 
 在 package.json 文件中为 scripts 添加
 
@@ -182,9 +182,10 @@ file-loader 和 url-loader 都可以
 ```javascript
 {
   test: /\.(woff|woff2|eot|ttf|otf)$/, // 字体格式
-  use:[{
+  use: [{
     loader: 'file-loader'
-  }
+  }]
+}
 ```
 
 
@@ -213,4 +214,33 @@ plugins: [
   new CleanWebpackPlugin(), // 自动清空输出文件,
   new HtmlWebpackPlugin({ template: 'src/index.html' }) // 指定html模板文件
 ]
+```
+
+
+
+## devServer
+
+监听我们文件，更改后自动帮我们进行打包和页面刷新，适合开发中使用，还有很多非常nice的配置
+
+```bash
+npm install webpack-dev-server -D
+```
+
+安装
+
+```bash
+"start": "webpack-dev-server"
+```
+
+在 package.json 文件中添加命命令，使用 **npm run start** 启动
+
+```javascript
+devServer: {
+  contentBase: './dist', // 打开文件路径
+  open: true, // 自动打开页面
+  port: 8080, // 指定端口号
+  proxy: { // 跨域代理
+    "/api": "http://localhost:3000"
+  }
+}
 ```

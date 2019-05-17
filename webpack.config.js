@@ -15,6 +15,14 @@ module.exports = {
     filename: '[name].js', // 输出文件名
     path: path.resolve(__dirname, 'dist') // 输出文件路径 __dirname为webpack.config当前文件
   },
+  devServer: {
+    contentBase: './dist', // 打开文件路径
+    open: true, // 自动打开页面
+    port: 8080, // 指定端口号
+    proxy: { // 跨域代理
+      "/api": "http://localhost:3000"
+    }
+  },
   module: {
     rules: [{
       test: /\.(css|scss)$/,
@@ -50,6 +58,6 @@ module.exports = {
   },
   plugins: [
     new CleanWebpackPlugin(), // 自动清空输出文件,
-    new HtmlWebpackPlugin({ template: 'src/index.html' })
+    new HtmlWebpackPlugin({ template: 'src/index.html' }) // 指定html模板文件
   ]
 }
