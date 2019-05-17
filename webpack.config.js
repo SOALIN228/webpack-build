@@ -3,7 +3,9 @@ const CleanWebpackPlugin = require('clean-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 module.exports = {
-  mode: 'production', // 打包格式，是否压缩
+  mode: 'development', // 打包环境，开发还是生产(development or production)
+  devtool: 'cheap-module-eval-source-map', // 开发环境配置 development
+  // devtool: 'cheap-module-source-map', // 生产环境配置 production
   entry: { // 入口文件
     main: './src/index.js', // 生成文件为main.js
     // bundle: './src/bundle.js' // 可以生成多个js文件，名字为键名

@@ -31,7 +31,9 @@ npx webpack -v
 const path = require('path')
 
 module.exports = {
-  mode: 'production', // 打包格式，是否压缩
+  mode: 'development', // 打包环境，开发还是生产(development or production)
+  devtool: 'cheap-module-eval-source-map', // 开发环境配置 development
+  // devtool: 'cheap-module-source-map', // 生产环境配置 production
   entry: { // 入口文件
     main: './src/index.js', // 生成文件为main.js
     // bundle: './src/bundle.js' // 可以生成多个js文件，名字为键名
@@ -43,6 +45,29 @@ module.exports = {
   }
 }
 ```
+
+
+
+## devtool
+
+因为代码出错显示的是打包后文件的位置，使用 devtool 配置 source-map 即可显示源文件的出错位置，devtool 会自动帮我们把打包位置文件位置映射到源文件位置
+
+五个关键字任意组合，配饰适合我们项目的：
+
+- eval： 使用 eval 包裹模块代码，也不会产生单独的`.map`
+- source-map： 产生`.map`文件(映射)
+- cheap： 不包含列信息(只显示报错的行信息，打包速度会快一点)
+- module： 包含 loader 的 sourcemap
+- inline： 将`.map`作为DataURI嵌入到打包文件中，不单独生成`.map`文件
+
+**推荐配置**：
+
+```bash
+devtool: 'cheap-module-eval-source-map', // 开发环境配置 development
+devtool: 'cheap-module-source-map', // 生产环境配置 production
+```
+
+
 
 ### 添加 npm 命令
 
