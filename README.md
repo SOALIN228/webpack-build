@@ -1,5 +1,5 @@
 # webpackDemo
-学习webpack
+学习webpack，具体以**文档为准**，不会就**查文档、查文档、查文档**
 
 ## 安装
 
@@ -15,7 +15,7 @@ npm install webpack webpack-cli -g
 npm install webpack webpack-cli -D
 ```
 
-不使用全局安装，使用 npx 查看项目的版本
+不使用全局安装，使用 **npx** 查看项目的版本
 
 ```bash
 npx webpack -v
@@ -23,7 +23,7 @@ npx webpack -v
 
 
 
-## 配置
+## 配置 entry 和 output
 
 在 webpack.config.js 文件中配置
 
@@ -32,13 +32,19 @@ const path = require('path')
 
 module.exports = {
   mode: 'production', // 打包格式，是否压缩
-  entry: './src/index.js', // 入口文件
+  entry: { // 入口文件
+    main: './src/index.js', // 生成文件为main.js
+    // bundle: './src/bundle.js' // 可以生成多个js文件，名字为键名
+  },
   output: { // 出口文件
-    filename: 'bundle.js', // 输出文件名
+    // publicPath: 'http://cdn.com.cn', // 如果静态文件使用CDN，添加指定CDN路径
+    filename: '[name].js', // 输出文件名
     path: path.resolve(__dirname, 'dist') // 输出文件路径 __dirname为webpack.config当前文件
   }
 }
 ```
+
+### 添加 npm 命令
 
 在 package.json 文件中为 scripts 添加
 
@@ -46,7 +52,7 @@ module.exports = {
 "bundle": "webpack"
 ```
 
-可以直接使用 npm run bundle 打包，手动命令为 npx webpack
+可以直接使用 **npm run bundle** 打包，手动命令为 **npx webpack**
 
 
 
