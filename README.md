@@ -56,8 +56,6 @@ module.exports = {
 
 使用各种不同的 loader 就可以让 webpack 支持各种资源的打包
 
-
-
 ### 打包图片
 
 ```bash
@@ -156,4 +154,32 @@ file-loader 和 url-loader 都可以
   use:[{
     loader: 'file-loader'
   }
+```
+
+
+
+## Plugins
+
+帮助 webpack 运行到某个时刻时，帮我做一些事情
+
+```bash
+npm install html-webpack-plugin -D
+```
+
+打包后生成 index.html 文件，并自动将打包的 JS 引入到 index.html 文件中
+
+```bash
+npm install clean-webpack-plugin -D
+```
+
+自动清空输出文件中的无效文件
+
+```javascript
+const CleanWebpackPlugin = require('clean-webpack-plugin') // 引入
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+
+plugins: [
+  new CleanWebpackPlugin(), // 自动清空输出文件,
+  new HtmlWebpackPlugin({ template: 'src/index.html' }) // 指定html模板文件
+]
 ```

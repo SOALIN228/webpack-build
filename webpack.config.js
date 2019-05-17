@@ -1,4 +1,6 @@
 const path = require('path')
+const CleanWebpackPlugin = require('clean-webpack-plugin')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 module.exports = {
   mode: 'production', // 打包格式，是否压缩
@@ -34,10 +36,14 @@ module.exports = {
       }]
     }, {
       test: /\.(woff|woff2|eot|ttf|otf)$/, // 字体格式
-      use:[{
+      use: [{
         loader: 'file-loader'
       }]
     }
     ]
-  }
+  },
+  plugins: [
+    new CleanWebpackPlugin(), // 自动清空输出文件,
+    new HtmlWebpackPlugin({ template: 'src/index.html' })
+  ]
 }
