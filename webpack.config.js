@@ -1,4 +1,5 @@
 const path = require('path')
+const webpack = require('webpack')
 const CleanWebpackPlugin = require('clean-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 
@@ -19,13 +20,15 @@ module.exports = {
     contentBase: './dist', // 打开文件路径
     open: true, // 自动打开页面
     port: 8080, // 指定端口号
-    proxy: { // 跨域代理
-      "/api": "http://localhost:3000"
-    }
+    // proxy: { // 跨域代理
+    //   '/api': 'http://localhost:3000'
+    // }
+    hot: true,
+    hotOnly: true
   },
   module: {
     rules: [{
-      test: /\.(css|scss)$/,
+      test: /\.scss$/,
       use: [
         'style-loader',
         {
@@ -37,6 +40,13 @@ module.exports = {
         },
         'postcss-loader', // 支持插件
         'sass-loader', // 打包sass
+      ]
+    }, {
+      test: /\.css$/,
+      use: [
+        'style-loader',
+        'css-loader',
+        'postcss-loader'
       ]
     }, {
       test: /\.(png|svg|jpg|gif)$/, // 图片格式
@@ -57,6 +67,7 @@ module.exports = {
     ]
   },
   plugins: [
+    new webpack.HotModuleReplacementPlugin(), // HMR
     new CleanWebpackPlugin(), // 自动清空输出文件,
     new HtmlWebpackPlugin({ template: 'src/index.html' }) // 指定html模板文件
   ]

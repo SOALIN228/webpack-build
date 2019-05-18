@@ -1,7 +1,11 @@
-import creatImg from './creatImg'
-import './index.scss'
+import './style.css'
 
-// creatImg()
+let btn = document.createElement('button')
+btn.innerHTML = '新增'
+document.body.append(btn)
 
-let root = document.getElementById('root')
-root.innerHTML = `<div class="iconfont icon-check-circle">abc</div>`
+btn.onclick = function () {
+  let div = document.createElement('div')
+  div.innerHTML = 'item'
+  document.body.appendChild(div)
+}

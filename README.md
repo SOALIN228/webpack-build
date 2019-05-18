@@ -157,7 +157,7 @@ loader 配置, loaderd 打包从下到上调用 loader
 
 ```javascript
 {
-  test: /\.(css|scss)$/,
+  test: /\.scss$/,
   use: [
     'style-loader',
     {
@@ -244,3 +244,40 @@ devServer: {
   }
 }
 ```
+
+
+
+### 添加热更新 HMR
+
+在更改 CSS 代码或 JS 代码后，页面会自动刷新，但是我们不想页面刷新，而是将原内容替换为修改过的内容，配置 HMR 可以帮助我们解决这个问题，提升开发效率
+
+```javascript
+const webpack = require('webpack') // 引入
+
+devServer: {
+  /*...*/
+  hot: true, // 开启热更新
+  hotOnly: true // HMR失效也不刷新浏览器
+}
+
+plugins: [
+  new webpack.HotModuleReplacementPlugin(), // HMR
+  /*...*/
+]
+```
+
+现在我们修改 CSS 文件就不会刷新页面，而且会热更新了
+
+但是修改 JS 文件我们还要配置一点东西
+
+```javascript
+if (module.hot) { // 页面重新渲染时触发
+  module.hot.accept('./number', () => { // 指定监听页面
+      document.body.removeChild(document.getElementById('number')) // 移除原来的DOM
+      number() // 重新添加DOM
+  })
+}
+```
+
+为什么修改 JS 要比修改 CSS 麻烦这么多，为什么 Vue 不需要写这些东西那，因为 style-loade 帮我们在 CSS 中做了上面那些事情，vue-loader 帮我们在 Vue 中做了上面那些事情
+
