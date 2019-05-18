@@ -28,6 +28,10 @@ module.exports = {
   },
   module: {
     rules: [{
+      test: /\.js$/,
+      exclude: /node_modules/, // 对node_modules中的JS进行忽略
+      loader: 'babel-loader'
+    }, {
       test: /\.scss$/,
       use: [
         'style-loader',

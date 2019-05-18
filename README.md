@@ -281,3 +281,106 @@ if (module.hot) { // 页面重新渲染时触发
 
 为什么修改 JS 要比修改 CSS 麻烦这么多，为什么 Vue 不需要写这些东西那，因为 style-loade 帮我们在 CSS 中做了上面那些事情，vue-loader 帮我们在 Vue 中做了上面那些事情
 
+## babel
+
+使用 babel 可以将我们的代码从 es6 或更高的版本，转换成低版本浏览器识别的 JS
+
+```bash
+npm install babel-loader @babel/core -D
+```
+
+添加 loader 和 核心模块
+
+```bash
+npm install @babel/preset-env -D
+```
+
+将代码转换成 es5
+
+```bash
+npm install @babel/polyfill core-js@３ --save
+```
+
+es6 中新增的对象或函数，只靠 preset-env 只能解决一部分，还需要添加 polyfill ，polyfill内部集成了(core-js)
+
+注：使用'useBuiltIns': 'usage'不需要添加 `import "@babel/polyfill";` ,因为会自动加载
+
+```javascript
+{
+  test: /\.js$/,
+  exclude: /node_modules/, // 对node_modules中的JS进行忽略
+  loader: 'babel-loader',
+  options: {
+    presets: [ // 插件集合
+      [
+        '@babel/preset-env',
+        {
+          targets: { // 指定兼容浏览器的版本
+            edge: "17",
+            firefox: "60",
+            chrome: "67",
+            safari: "11.1",
+          },
+          useBuiltIns: 'usage', // 按需转入，用到哪些新语法，就添加哪些
+          corejs: 3 // 指定版本,不写会报错，坑
+        }
+      ]
+    ]
+  }
+}
+```
+
+如果配置的 babel 属性很多可以新建一个名为 `.babelrc` 的文件，专门存放关于 babel 的配置(json格式，双引号)
+
+```json
+{
+  "presets": [
+    [
+      "@babel/preset-env",
+      {
+        "targets": {
+          "edge": "17",
+          "firefox": "60",
+          "chrome": "67",
+          "safari": "11.1"
+        },
+        "useBuiltIns": "usage",
+        "corejs": 3
+      }
+    ]
+  ]
+}
+```
+
+polyfill 依赖全局环境，会造成污染，如果自己写组件库，使用plugin-transform-runtime, 以闭包的形式注入，不污染全局属性
+
+```bash
+npm install @babel/plugin-transform-runtime -D
+```
+
+```bash
+npm install @babel/runtime --save
+```
+
+```bash
+npm install @babel/runtime-corejs3  --save
+```
+
+```javascript
+{
+  "plugins": [
+    [
+      "@babel/plugin-transform-runtime",
+      {
+        "absoluteRuntime": false,
+        "corejs": 3,
+        "helpers": true,
+        "regenerator": true,
+        "useESModules": false
+      }
+    ]
+  ]
+}
+```
+
+plugins 同样可以配置到 `.babelrc` 中
