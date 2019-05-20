@@ -25,7 +25,7 @@ npx webpack -v
 
 ## 配置 entry 和 output
 
-在 webpack.config.js 文件中配置
+在 webpack.dev.js 文件中配置
 
 ```javascript
 const path = require('path')
@@ -36,7 +36,7 @@ module.exports = {
   // devtool: 'cheap-module-source-map', // 生产环境配置 production
   entry: { // 入口文件
     main: './src/index.js', // 生成文件为main.js
-    // bundle: './src/bundle.js' // 可以生成多个js文件，名字为键名
+    bundle.js
   },
   output: { // 出口文件
     // publicPath: 'http://cdn.com.cn', // 如果静态文件使用CDN，添加指定CDN路径
@@ -83,17 +83,19 @@ devtool: 'cheap-module-source-map', // 生产环境配置 production
 
 ## Loader
 
-在 webpack.config.js 文件 module 中配置
+在 webpack.dev.js 文件 module 中配置
 
 使用各种不同的 loader 就可以让 webpack 支持各种资源的打包
 
 ### 打包图片
 
 ```bash
-npm install --save-dev file-loader url-loader
+npm install file-loader url-loader -D
 ```
 
 url-loader 和 file-loader 功能相似，区别是 url-loader 可以指定当图片小于设置参数时，使用base64打包
+
+**注**：file-loader url-loader 最好都安装，因为在打包 css中的图片时 url-loader 依赖 file-loader
 
 ```javascript
 {
@@ -247,7 +249,7 @@ devServer: {
 
 
 
-### 添加热更新 HMR
+## 添加热更新 HMR
 
 在更改 CSS 代码或 JS 代码后，页面会自动刷新，但是我们不想页面刷新，而是将原内容替换为修改过的内容，配置 HMR 可以帮助我们解决这个问题，提升开发效率
 
@@ -281,6 +283,8 @@ if (module.hot) { // 页面重新渲染时触发
 
 为什么修改 JS 要比修改 CSS 麻烦这么多，为什么 Vue 不需要写这些东西那，因为 style-loade 帮我们在 CSS 中做了上面那些事情，vue-loader 帮我们在 Vue 中做了上面那些事情
 
+
+
 ## babel
 
 使用 babel 可以将我们的代码从 es6 或更高的版本，转换成低版本浏览器识别的 JS
@@ -298,7 +302,7 @@ npm install @babel/preset-env -D
 将代码转换成 es5
 
 ```bash
-npm install @babel/polyfill core-js@３ --save
+npm install @babel/polyfill core-js@3 --save
 ```
 
 es6 中新增的对象或函数，只靠 preset-env 只能解决一部分，还需要添加 polyfill ，polyfill内部集成了(core-js)
@@ -384,3 +388,61 @@ npm install @babel/runtime-corejs3  --save
 ```
 
 plugins 同样可以配置到 `.babelrc` 中
+
+
+
+## tree shaking
+
+只打包用到的文件，如：引入文件 main.js ，但是只使用了其中一个方法，默认情况下会全部都进行打包，但是配置了 tree shaking 只会打包用到的文件
+
+**开发环境配置**
+
+在 webpack.dev.js 文件中添加下面代码
+
+```javascript
+optimization: {
+  usedExports: true
+}
+```
+
+**注：**开发环境下还是会全部进行打包，但是会标记用到了哪些，生产环境则只打包用到的
+
+**生产环境配置**
+
+只需要指定 `mode: 'production'`  即可
+
+**配置忽略**
+
+如果要打包的文件都会进行输出，在 package.json 文件中添加 "sideEffects":  false 即可，但是更多的情况我们需要配置忽略，将他们写入数组中：如："@babel/polly-fill"，"*.css" 等
+
+
+
+## 开发和生成环境代码分离
+
+```bash
+npm install webpack-merge -D
+```
+
+用于通用配置
+
+将 webpack.config.js 分解成 webpack.dev.js 和 webpack.prod.js 两个配置文件，用于打包不同环境的配置，
+
+因为很多配置既要在开发环境用到也要在生成环境中用到，所以将共有属性抽取出来，建一个 webpack.common.js 
+
+```javascript
+const merge = require('webpack-merge') // 用于通用配置
+const commonConfig = require('./webpack.common') // 引入通用文件
+
+const devConfig = {
+    /*...*/
+}
+
+module.exports = merge(commonConfig, devConfig) // 导出配置文件
+```
+
+在 package.json 中更改开发和生产环境的命令
+
+```json
+"dev": "webpack-dev-server --config build/webpack.dev.js",
+"bundle": "webpack --config build/webpack.prod.js"
+```
