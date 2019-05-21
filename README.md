@@ -74,10 +74,10 @@ devtool: 'cheap-module-source-map', // 生产环境配置 production
 在 package.json 文件中为 scripts 添加
 
 ```bash
-"bundle": "webpack"
+"build": "webpack"
 ```
 
-可以直接使用 **npm run bundle** 打包，手动命令为 **npx webpack**
+可以直接使用 **npm run build** 打包，手动命令为 **npx webpack**
 
 
 
@@ -444,5 +444,81 @@ module.exports = merge(commonConfig, devConfig) // 导出配置文件
 
 ```json
 "dev": "webpack-dev-server --config build/webpack.dev.js",
-"bundle": "webpack --config build/webpack.prod.js"
+"build": "webpack --config build/webpack.prod.js"
 ```
+
+
+
+## 代码分割
+
+将代码都打包到一个文件，首屏会很慢，所以利用浏览器可以同时加载多个 JS 文件，将代码分割
+
+**同步方式**
+
+同步引入
+
+```javascript
+import x from './xxx'
+```
+
+**异步方式**
+
+```bash
+npm install @babel/plugin-syntax-dynamic-import -D
+```
+
+引入 babel 预编译文件
+
+在 .babelrc 文件中添加下面代码
+
+```json
+"plugins": [
+  "@babel/plugin-syntax-dynamic-import"
+]
+```
+
+异步引入
+
+/* webpackChunkName:"lodash" */ 定义打包后文件的名字
+
+```javascript
+function getComponent () {
+  return import(/* webpackChunkName:"lodash" */'lodash').then(_ => {
+    let element = document.createElement('div')
+    element.innerHTML = _.join(['Hello', 'webpack'], '-')
+    return element
+  })
+}
+
+getComponent().then(element => {
+  document.body.append(element)
+})
+```
+
+webpack 中添加如下代码
+
+```javascript
+optimization: {
+  splitChunks: { // 代码分割
+    chunks: 'all', // initial同步 async异步 all全部
+    minSize: 30000, // 超过30000字节才会进行打包
+    minChunks: 1, // 引用次数大于等于1
+    maxAsyncRequests: 5, // 最多分割5个文件
+    maxInitialRequests: 3, // 入口文件引入的库最多分割3个文件
+    automaticNameDelimiter: '~', // 代码连接符
+    name: true, // vendors 和 default 起的名字有效
+    cacheGroups: {
+      vendors: {
+        test: /[\\/]node_modules[\\/]/, // 对node_modules中的文件进行打包
+        priority: -10, // 优先级
+        name: "vendors" // 将所有符合要求的文件打包到vendors文件中
+      },
+      default: { // 对不在node_modules中的文件进行打包
+        priority: -20,
+        reuseExistingChunk: true // 忽略已经打包过的共用代码
+      }
+    }
+  }
+}
+```
+

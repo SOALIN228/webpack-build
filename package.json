@@ -8,8 +8,9 @@
   "private": true,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "dev-build": "webpack --config build/webpack.dev.js",
     "dev": "webpack-dev-server --config build/webpack.dev.js",
-    "bundle": "webpack --config build/webpack.prod.js"
+    "build": "webpack --config build/webpack.prod.js"
   },
   "repository": {
     "type": "git",
@@ -23,6 +24,7 @@
   "homepage": "https://github.com/SOALIN228/webpackDemo#readme",
   "devDependencies": {
     "@babel/core": "^7.4.4",
+    "@babel/plugin-syntax-dynamic-import": "^7.2.0",
     "@babel/preset-env": "^7.4.4",
     "autoprefixer": "^9.5.1",
     "babel-loader": "^8.0.6",
@@ -43,6 +45,7 @@
   },
   "dependencies": {
     "@babel/polyfill": "^7.4.4",
-    "core-js": "^3.0.1"
+    "core-js": "^3.0.1",
+    "lodash": "^4.17.11"
   }
 }
