@@ -15,12 +15,35 @@ const devConfig = {
     hot: true,
     // hotOnly: true
   },
+  module: {
+    rules: [
+      {
+        test: /\.scss$/,
+        use: [
+          'style-loader',
+          {
+            loader: 'css-loader', // 打包css
+            options: {
+              importLoaders: 2, // 在调用当前loader(CSS)之前，要调用两个loader(postcss 和 sass)
+              // modules: true // 模块化打包css
+            }
+          },
+          'postcss-loader', // 支持插件
+          'sass-loader', // 打包sass
+        ]
+      }, {
+        test: /\.css$/,
+        use: [
+          'style-loader',
+          'css-loader',
+          'postcss-loader'
+        ]
+      }
+    ]
+  },
   plugins: [
     new webpack.HotModuleReplacementPlugin() // HMR
-  ],
-  optimization: {
-    usedExports: true
-  }
+  ]
 }
 
 module.exports = merge(commonConfig, devConfig) // 导出配置文件

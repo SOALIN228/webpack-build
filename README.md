@@ -463,6 +463,8 @@ import x from './xxx'
 
 **异步方式**
 
+可以做懒加载，只有在用到的时候才会进行加载
+
 ```bash
 npm install @babel/plugin-syntax-dynamic-import -D
 ```
@@ -502,7 +504,7 @@ optimization: {
   splitChunks: { // 代码分割
     chunks: 'all', // initial同步 async异步 all全部
     minSize: 30000, // 超过30000字节才会进行打包
-    minChunks: 1, // 引用次数大于等于1
+    minChunks: 1, // 打包后被chunk引用次数大于等于1，会单独打包成一个文件
     maxAsyncRequests: 5, // 最多分割5个文件
     maxInitialRequests: 3, // 入口文件引入的库最多分割3个文件
     automaticNameDelimiter: '~', // 代码连接符
@@ -511,7 +513,7 @@ optimization: {
       vendors: {
         test: /[\\/]node_modules[\\/]/, // 对node_modules中的文件进行打包
         priority: -10, // 优先级
-        name: "vendors" // 将所有符合要求的文件打包到vendors文件中
+        name: "vendors" // 将所有符合要求的文件打包成一个vendors文件
       },
       default: { // 对不在node_modules中的文件进行打包
         priority: -20,
@@ -520,5 +522,74 @@ optimization: {
     }
   }
 }
+```
+
+因为上面代码大部分配置都是默认的，我们并不需要修改，所以可以省略，由 webpack 来加载默认配置
+
+```javascript
+optimization: {
+  splitChunks: {
+  	chunks: 'all' // 默认为 async
+  }
+}
+```
+
+```javascript
+/* webpackPrefetch: true */
+```
+
+页面带宽有剩余时，自动加载
+
+
+
+## CSS打包
+
+将css代码打包到css文件中
+
+```bash
+npm install mini-css-extract-plugin -D
+```
+
+```javascript
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+
+{
+  test: /\.css$/,
+    use: [
+      MiniCssExtractPlugin.loader, // 替换style-loader
+      'css-loader',
+      'postcss-loader'
+    ]
+}
+
+plugins: [
+  new MiniCssExtractPlugin({ // 打包css
+    filename: '[name].css',
+    chunkFilename: '[id].css'
+  })
+]
+```
+
+```bash
+npm install optimize-css-assets-webpack-plugin -D
+```
+
+添加css代码压缩
+
+```javascript
+const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin')
+
+optimization: {
+  minimizer: [new OptimizeCSSAssetsPlugin({})] // css代码压缩
+}
+```
+
+注：如果使用了 tree shaking，在 package.json 中添加忽略
+
+```json
+"sideEffects": [
+  "@babel/polly-fill",
+  "*.css"
+],
 ```
 
