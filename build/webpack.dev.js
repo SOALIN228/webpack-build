@@ -6,7 +6,7 @@ const devConfig = {
   mode: 'development', // 开发环境
   devtool: 'cheap-module-eval-source-map', // 开发环境配置 development
   devServer: {
-    contentBase: './dist', // 打开文件路径
+    contentBase: '../dist', // 打开文件路径
     open: true, // 自动打开页面
     port: 8080, // 指定端口号
     // proxy: { // 跨域代理
@@ -43,7 +43,11 @@ const devConfig = {
   },
   plugins: [
     new webpack.HotModuleReplacementPlugin() // HMR
-  ]
+  ],
+  output: {
+    filename: '[name].js', // 输出文件名
+    chunkFilename: '[name].js' // 通过html中js引入的js
+  }
 }
 
 module.exports = merge(commonConfig, devConfig) // 导出配置文件

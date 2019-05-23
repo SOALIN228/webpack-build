@@ -35,7 +35,7 @@ module.exports = {
   devtool: 'cheap-module-eval-source-map', // 开发环境配置 development
   // devtool: 'cheap-module-source-map', // 生产环境配置 production
   entry: { // 入口文件
-    main: './src/index.js', // 生成文件为main.js
+    main: main.jsmain.js件为main.js
     bundle.js
   },
   output: { // 出口文件
@@ -395,9 +395,9 @@ plugins 同样可以配置到 `.babelrc` 中
 
 只打包用到的文件，如：引入文件 main.js ，但是只使用了其中一个方法，默认情况下会全部都进行打包，但是配置了 tree shaking 只会打包用到的文件
 
-**开发环境配置**
+**环境配置**
 
-在 webpack.dev.js 文件中添加下面代码
+在 webpack.common.js 文件中添加下面代码
 
 ```javascript
 optimization: {
@@ -535,10 +535,14 @@ optimization: {
 ```
 
 ```javascript
-/* webpackPrefetch: true */
+document.addEventListener('click', () => {
+  import(/* webpackPrefetch: true */ './click.js').then(({default: func}) => {
+    func()
+  })
+})
 ```
 
-页面带宽有剩余时，自动加载
+/* webpackPrefetch: true */ 当页面带宽有剩余时，自动加载
 
 
 
@@ -591,5 +595,41 @@ optimization: {
   "@babel/polly-fill",
   "*.css"
 ],
+```
+
+
+
+## 配置 hash 用于缓存
+
+代码上线后，如果更改代码内容，但是文件名不变的话，浏览器会从缓存中将老版本的文件取出，这就头疼了，还好 webpack 提拱了解决办法
+
+```javascript
+output: {
+  filename: '[name].[contenthash].js', // 输出文件名使用hash
+  chunkFilename: '[name].[contenthash].js' // 通过html中js引入的js
+}
+```
+
+这样每个文件都有了一个独特的 hash 值，如果我们改变文件内容 hash 会改变，否则不变
+
+CSS 也是一样
+
+```javascript
+plugins: [
+  new MiniCssExtractPlugin({ // 打包css
+    filename: '[name].[contenthash].css', // 配置hash
+    chunkFilename: '[id].[contenthash].css'
+  })
+]
+```
+
+**注：**webpack 老版本可能处理起 hash 会有问题，所以添加下面代码，将hash管理单独成一个文件就ok了，**新版本无视**
+
+```javascript
+optimization: {
+  runtimeChunk: { // 将hash关联分离出来
+    name: 'runtime'
+  }
+}
 ```
 

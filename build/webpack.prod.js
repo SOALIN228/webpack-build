@@ -34,12 +34,16 @@ const prodConfig = {
   },
   plugins: [
     new MiniCssExtractPlugin({ // 打包css
-      filename: '[name].css',
-      chunkFilename: '[id].css'
+      filename: '[name].[contenthash].css', // 添加hash
+      chunkFilename: '[id].[contenthash].css' // 添加hash
     })
   ],
   optimization: {
     minimizer: [new OptimizeCSSAssetsPlugin({})] // css代码压缩
+  },
+  output: {
+    filename: '[name].[contenthash].js', // 输出文件名使用hash
+    chunkFilename: '[name].[contenthash].js' // 通过html中js引入的js
   }
 }
 

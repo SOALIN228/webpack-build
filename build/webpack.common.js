@@ -4,13 +4,11 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 module.exports = {
   entry: { // 入口文件
-    main: './src/index.js', // 生成文件为main.js
+    main: './src/main.js', // 生成文件为main.js
     // bundle: './src/bundle.js' // 可以生成多个js文件，名字为键名
   },
   output: { // 出口文件
     // publicPath: 'http://cdn.com.cn', // 如果静态文件使用CDN，添加指定CDN路径
-    filename: '[name].js', // 输出文件名
-    chunkFilename: '[name].chunk.js', // 通过html中js引入的js
     path: path.resolve(__dirname, '../dist') // 输出文件路径 __dirname为webpack.config当前文件
   },
   module: {
@@ -46,6 +44,7 @@ module.exports = {
     new CleanWebpackPlugin(), // 自动清空输出文件,
     new HtmlWebpackPlugin({ template: 'src/index.html' }) // 指定html模板文件
   ],
+  performance: false, // 忽略性能问题警告
   optimization: {
     usedExports: true, // 按需打包
     splitChunks: { // 代码分割
