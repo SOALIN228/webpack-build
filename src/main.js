@@ -1,6 +1,5 @@
-import './style.css'
-import _ from 'lodash'
-
-const dom = document.createElement('div')
-dom.innerHTML = _.join(['div', '1'], '1231')
-document.body.appendChild(dom)
+// import './style.css'
+//
+// const dom = $('<div>')
+// dom.html(_join(['div', 'soa'], '---'))
+// $('body').append(dom)

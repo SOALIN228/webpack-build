@@ -1,4 +1,5 @@
 const path = require('path')
+const webpack = require('webpack')
 const CleanWebpackPlugin = require('clean-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 
@@ -21,7 +22,11 @@ module.exports = {
       }, {
         test: /\.js$/,
         exclude: /node_modules/, // 对node_modules中的JS进行忽略
-        loader: 'babel-loader'
+        use: [{
+          loader: 'babel-loader'
+        }, {
+          loader: 'imports-loader?this=>window' // 将默认this改为window
+        }]
       }, {
         test: /\.(png|svg|jpg|gif)$/, // 图片格式
         use: [{
@@ -42,7 +47,11 @@ module.exports = {
   },
   plugins: [
     new CleanWebpackPlugin(), // 自动清空输出文件,
-    new HtmlWebpackPlugin({ template: 'src/index.html' }) // 指定html模板文件
+    new HtmlWebpackPlugin({ template: 'src/index.html' }), // 指定html模板文件
+    new webpack.ProvidePlugin({
+      $: 'jQuery', // 自动引入jquery
+      _join: ['lodash', 'join'] // 使用_join时自动引入lodash中的join
+    })
   ],
   performance: false, // 忽略性能问题警告
   optimization: {
