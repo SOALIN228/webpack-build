@@ -8,7 +8,6 @@
   "description": "学习webpack",
   "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "dev-build": "webpack --config build/webpack.dev.js",
     "dev-stats": "webpack --profile --json > stats.json",
     "dev": "webpack-dev-server --config build/webpack.dev.js",

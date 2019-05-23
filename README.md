@@ -633,3 +633,30 @@ optimization: {
 }
 ```
 
+
+
+## 自动引入
+
+使用 jquery 等库文件要在每个 js 中都引用非常麻烦，可以通过配置，自动引入
+
+```
+plugins: [
+  new webpack.ProvidePlugin({
+    $: 'jQuery', // 自动引入jquery
+    _join: ['lodash', 'join'] // 使用_join时自动引入lodash中的join
+  })
+]
+```
+
+指定 this 的 loader
+
+每个js文件的this默认执行自己，可以通过imports-loader修改默认this，但也可以通过call来指定this
+
+```bash
+npm install imports-loader -D
+```
+
+```javascript
+loader: 'imports-loader?this=>window' // 将默认this改为window
+```
+
