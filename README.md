@@ -35,7 +35,7 @@ module.exports = {
   devtool: 'cheap-module-eval-source-map', // 开发环境配置 development
   // devtool: 'cheap-module-source-map', // 生产环境配置 production
   entry: { // 入口文件
-    main: main.jsmain.js件为main.js
+    main: main.js, // 文件名为main.js
     bundle.js
   },
   output: { // 出口文件
@@ -183,7 +183,7 @@ file-loader 和 url-loader 都可以
 
 ```javascript
 {
-  test: /\.(woff|woff2|eot|ttf|otf)$/, // 字体格式
+  test: /\.(woff|woff2|eot|svg|ttf|otf)$/, // 字体格式
   use: [{
     loader: 'file-loader'
   }]
