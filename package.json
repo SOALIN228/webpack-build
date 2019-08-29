@@ -17,7 +17,7 @@
     "type": "git",
     "url": "git+https://github.com/SOALIN228/webpackDemo.git"
   },
-  "author": "",
+  "author": "soalin",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/SOALIN228/webpackDemo/issues"
@@ -49,6 +49,7 @@
   },
   "dependencies": {
     "@babel/polyfill": "^7.4.4",
+    "axios": "^0.18.0",
     "core-js": "^3.0.1",
     "jquery": "^3.4.1",
     "lodash": "^4.17.11"
