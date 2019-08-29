@@ -172,7 +172,7 @@ loader 配置, loaderd 打包从下到上调用 loader
       }
     },
     'postcss-loader', // 支持插件
-    'sass-loader', // 打包sass
+    'sass-loader' // 打包sass
   ]
 }
 ```

@@ -8,6 +8,15 @@ module.exports = {
   module: {
     rules: [
       {
+        test: /\.scss$/,
+        use: [
+          'style-loader',
+          'css-loader',
+          'postcss-loader', // 支持插件
+          'sass-loader' // 打包sass
+        ]
+      },
+      {
         test: /\.(png|svg|jpg|gif)$/,
         use: {
           loader: 'url-loader',
