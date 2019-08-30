@@ -1,6 +1,30 @@
-.avatar {
-    width: 150px;
-    height: 150px;
-    transform: translate(150px, 150px);
+@font-face {font-family: "iconfont";
+  src: url('./font/iconfont.eot?t=1567130362164'); /* IE9 */
+  src: url('./font/iconfont.eot?t=1567130362164#iefix') format('embedded-opentype'), /* IE6-IE8 */
+  url('data:application/x-font-woff2;charset=utf-8;base64,d09GMgABAAAAAAOEAAsAAAAAB6QAAAM4AAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHEIGVgCCfgqDBIJvATYCJAMMCwgABCAFhG0HRRu8BhEVnE/IfhzkpqnrvHNbHGZVNNHmvwfPY131fpKqSWOWZnWvpROEk+wKgM25pnszIurdUL5Fj76Q0iC9LHvweQ6XNj3A+YFyWXPY2tQLMA4osLEmxYncgZyg3zB2QUs8DQGCpCEXUqlKLQ+LwZwkgHTv0qkNNmPANGQLFsGtWGmQ2ThYNUWdBWYFvy9vKCAWFI7GnFmvY+X2lHuunms92h/d3CMgnM4GsHWggVyAAYlWOuqho0QuNEE1YcgE2xok8Fz7/nPlCTb7Dw8EBeJiZoYByAZDCp47Ci5NCFehANAAuDxCahiwHVETzdSohOFwwtKDglMTedGFSfwd5yeOLJiWtNmihU2vXvWuXYvcuNHo+vXBtiwa8tL9rl7ttzCRN39B4hAObVFSsS1K0qiO11Eo8Uv4ozx64MiWlKtuFC2adtXJnBem1V5/PHXqwruvpR696dC+YHB+or6CaW8+kCZvvOXLb1Vpu+xj5xTLOGzT8rSbLmXMVPRousPm719z2OJ6PFeS5IWe5F2hL13SULoC86AE34izKxLpNSNj0XI1PrutS7V2P9coVzTjrlcZm63s3UmsL63slbF5+fj1O1FFvN69PcnW2i3lts6W4kShNDZp/nJDm1w9furqm6Vvrp46frXJtPzlgslzZTiRvEOBJ717i0eVvvmtAfCPaVRZDkAfUw9/1t+wY/XCzK3ilvpmQwaAWzPX/Q4C/jFDd5W9HafArxF2bDGaGqw0isARGGSt4oblQc2Nj+lJwP3hqsSdM0GwJE6giCE1NJZMREPNBYcQheBiKYsgOam6PkRC+qIREwByMAFAiMdWKOJwFJp4nCMa6j04JOEdXOKJRpCoJNwxROAgSZ0YtaAD84dkafW2WVSYfcewz5rT4oD+Rt5SGIa2z6dvuCJPMWf7hFHEg2da4ArOw3kmKEwZrbRRpBy7zld9qLW0VIoToxZ0gPkDydLqvc6iCj9/x7DPmhuaqpxv5C31Dgy09B2IN8XaqelW3tk+YUTEA55pAa7AhrOVIKBUD8topSUOiJUjHWrnuyra5VXL++0Cgpg7alGixVC3i2inxia2M9bOQNpds5eZtKsq') format('woff2'),
+  url('./font/iconfont.woff?t=1567130362164') format('woff'),
+  url('./font/iconfont.ttf?t=1567130362164') format('truetype'), /* chrome, firefox, opera, Safari, Android, iOS 4.2+ */
+  url('./font/iconfont.svg?t=1567130362164#iconfont') format('svg'); /* iOS 4.1- */
 }
 
+.iconfont {
+  font-family: "iconfont" !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-check-circle:before {
+  content: "\e602";
+}
+
+.icon-cloud-upload:before {
+  content: "\e603";
+}
+
+.avatar {
+  width: 150px;
+  height: 150px;
+  transform: translate(100px, 100px);
+}

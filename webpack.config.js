@@ -10,8 +10,14 @@ module.exports = {
       {
         test: /\.scss$/,
         use: [
-          'style-loader',
-          'css-loader',
+          'style-loader', // 添加到head顶部
+          {
+            loader: 'css-loader', // 打包css
+            options: {
+              importLoaders: 2, // 在调用当前loader(CSS)之前，要调用两个loader(postcss 和 sass)
+              modules: true // 模块化打包css
+            }
+          },
           'postcss-loader', // 支持插件
           'sass-loader' // 打包sass
         ]
@@ -26,6 +32,12 @@ module.exports = {
             limit: 20480 // 图片大于2kb使用base64进行打包，减少http请求
           }
         }
+      },
+      {
+        test: /\.(woff|woff2|eot|svg|ttf|otf)$/, // 字体格式
+        use: [{
+          loader: 'file-loader'
+        }]
       }
     ]
   },

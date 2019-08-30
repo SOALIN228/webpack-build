@@ -163,7 +163,7 @@ loader 配置, loaderd 打包从下到上调用 loader
 {
   test: /\.scss$/,
   use: [
-    'style-loader',
+    'style-loader', // 添加到head顶部
     {
       loader: 'css-loader', // 打包css
       options: {
@@ -175,6 +175,20 @@ loader 配置, loaderd 打包从下到上调用 loader
     'sass-loader' // 打包sass
   ]
 }
+```
+
+```javascript
+import th from './th.jpg' // 引入图片
+import './index.scss' // 全局引入
+// import style from './index.scss' // 模块引入
+
+var img = new Image()
+img.src = th
+img.classList.add('avatar') // 全局打包
+// img.classList.add(style.avatar) // 模块打包
+
+var root = document.getElementById('root')
+root.append(img)
 ```
 
 
