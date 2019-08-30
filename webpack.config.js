@@ -4,8 +4,17 @@ const path = require('path')
 
 module.exports = {
   mode: 'development', // 打包环境，开发还是生产(development or production)
+  devtool: 'cheap-module-eval-source-map',
   entry: { // 入口文件
     main: './src/index.js' // 文件名为main.js
+  },
+  devServer: {
+    contentBase: './dist', // 打开文件路径
+    open: true, // 自动打开页面
+    port: 8080, // 指定端口号
+    proxy: { // 跨域代理
+      "/api": "http://localhost:3000"
+    }
   },
   module: {
     rules: [
@@ -50,7 +59,6 @@ module.exports = {
     }) // 指定html模板文件
   ],
   output: { // 出口文件
-    // publicPath: 'http://cdn.com.cn', // 如果静态文件使用CDN，添加指定CDN路径
     filename: '[name].bundle.js', // 输出文件名
     path: path.resolve(__dirname, 'dist') // 输出文件路径 __dirname为webpack.config当前文件
   }
