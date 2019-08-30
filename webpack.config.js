@@ -1,3 +1,5 @@
+const { CleanWebpackPlugin } = require('clean-webpack-plugin') // 引入
+const HtmlWebpackPlugin = require('html-webpack-plugin') // 通过插件生成html模板
 const path = require('path')
 
 module.exports = {
@@ -41,8 +43,15 @@ module.exports = {
       }
     ]
   },
+  plugins: [
+    new CleanWebpackPlugin(), // 自动清空输出文件
+    new HtmlWebpackPlugin({
+      template: 'src/index.html'
+    }) // 指定html模板文件
+  ],
   output: { // 出口文件
-    filename: 'bundle.js', // 输出文件名
+    // publicPath: 'http://cdn.com.cn', // 如果静态文件使用CDN，添加指定CDN路径
+    filename: '[name].bundle.js', // 输出文件名
     path: path.resolve(__dirname, 'dist') // 输出文件路径 __dirname为webpack.config当前文件
   }
 }

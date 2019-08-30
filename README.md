@@ -225,11 +225,11 @@ npm install clean-webpack-plugin -D
 自动清空输出文件中的无效文件
 
 ```javascript
-const CleanWebpackPlugin = require('clean-webpack-plugin') // 引入
-const HtmlWebpackPlugin = require('html-webpack-plugin')
+const { CleanWebpackPlugin } = require("clean-webpack-plugin") // 引入
+const HtmlWebpackPlugin = require('html-webpack-plugin') // 通过插件生成html模板
 
 plugins: [
-  new CleanWebpackPlugin(), // 自动清空输出文件,
+  new CleanWebpackPlugin(), // 自动清空输出文件
   new HtmlWebpackPlugin({ template: 'src/index.html' }) // 指定html模板文件
 ]
 ```
