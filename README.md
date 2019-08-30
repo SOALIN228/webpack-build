@@ -163,7 +163,7 @@ loader 配置, loaderd 打包从下到上调用 loader
 {
   test: /\.scss$/,
   use: [
-    'style-loader',
+    'style-loader', // 添加到head顶部
     {
       loader: 'css-loader', // 打包css
       options: {
@@ -172,9 +172,23 @@ loader 配置, loaderd 打包从下到上调用 loader
       }
     },
     'postcss-loader', // 支持插件
-    'sass-loader', // 打包sass
+    'sass-loader' // 打包sass
   ]
 }
+```
+
+```javascript
+import th from './th.jpg' // 引入图片
+import './index.scss' // 全局引入
+// import style from './index.scss' // 模块引入
+
+var img = new Image()
+img.src = th
+img.classList.add('avatar') // 全局打包
+// img.classList.add(style.avatar) // 模块打包
+
+var root = document.getElementById('root')
+root.append(img)
 ```
 
 
@@ -211,11 +225,11 @@ npm install clean-webpack-plugin -D
 自动清空输出文件中的无效文件
 
 ```javascript
-const CleanWebpackPlugin = require('clean-webpack-plugin') // 引入
-const HtmlWebpackPlugin = require('html-webpack-plugin')
+const { CleanWebpackPlugin } = require("clean-webpack-plugin") // 引入
+const HtmlWebpackPlugin = require('html-webpack-plugin') // 通过插件生成html模板
 
 plugins: [
-  new CleanWebpackPlugin(), // 自动清空输出文件,
+  new CleanWebpackPlugin(), // 自动清空输出文件
   new HtmlWebpackPlugin({ template: 'src/index.html' }) // 指定html模板文件
 ]
 ```
