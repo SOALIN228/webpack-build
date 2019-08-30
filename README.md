@@ -37,12 +37,11 @@ module.exports = {
   devtool: 'cheap-module-eval-source-map', // 开发环境配置 development
   // devtool: 'cheap-module-source-map', // 生产环境配置 production
   entry: { // 入口文件
-    main: main.js, // 文件名为main.js
-    bundle.js
+    main: main.js // 文件名为main.js
   },
   output: { // 出口文件
     // publicPath: 'http://cdn.com.cn', // 如果静态文件使用CDN，添加指定CDN路径
-    filename: '[name].js', // 输出文件名
+    filename: '[name].bundle.js', // 输出文件名
     path: path.resolve(__dirname, 'dist') // 输出文件路径 __dirname为webpack.config当前文件
   }
 }
@@ -50,7 +49,7 @@ module.exports = {
 
 
 
-### devtool
+## Source Map
 
 因为代码出错显示的是打包后文件的位置，使用 devtool 配置 source-map 即可显示源文件的出错位置，devtool 会自动帮我们把打包位置文件位置映射到源文件位置
 
@@ -71,7 +70,7 @@ devtool: 'cheap-module-source-map', // 生产环境配置 production
 
 
 
-### 打包命令
+## 打包命令
 
 在 package.json 文件中为 scripts 添加
 
@@ -238,7 +237,7 @@ plugins: [
 
 ## devServer
 
-监听我们文件，更改后自动帮我们进行打包和页面刷新，适合开发中使用，还有很多非常nice的配置
+监听我们文件，更改后自动帮我们进行**打包**和**页面刷新**，适合**开发中使用**，还有很多非常nice的配置
 
 ```bash
 npm install webpack-dev-server -D

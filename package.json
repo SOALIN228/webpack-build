@@ -17,10 +17,12 @@
     "postcss-loader": "^3.0.0",
     "sass-loader": "^7.3.1",
     "style-loader": "^1.0.0",
-    "url-loader": "^2.1.0"
+    "url-loader": "^2.1.0",
+    "webpack-dev-server": "^3.8.0"
   },
   "scripts": {
-    "bundle": "webpack"
+    "bundle": "webpack",
+    "start": "webpack-dev-server"
   },
   "repository": {
     "type": "git",
