@@ -45,6 +45,11 @@ module.exports = {
         ]
       },
       {
+        test: /\.js$/,
+        exclude: /node_modules/, // 对node_modules中的JS进行忽略
+        loader: 'babel-loader'
+      },
+      {
         test: /\.(png|svg|jpg|gif)$/,
         use: {
           loader: 'url-loader',

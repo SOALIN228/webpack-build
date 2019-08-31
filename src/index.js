@@ -1,11 +1,10 @@
-import './style.css'
+const arr = [
+  new Promise(() => {
+  }),
+  new Promise(() => {
+  })
+]
 
-var btn = document.getElementById('button')
-btn.innerHTML = '新增'
-document.body.appendChild(btn)
-
-btn.onclick = function () {
-  var div = document.createElement('div')
-  div.innerHTML = 'item'
-  document.body.appendChild(div)
-}
+arr.map(item => {
+  console.log(item)
+})
