@@ -406,6 +406,34 @@ plugins 同样可以配置到 `.babelrc` 中
 
 
 
+## React
+
+```bash
+npm install react react-dom --save
+```
+
+安装react
+
+```bash
+npm install --save-dev @babel/preset-react
+```
+
+安装`preset-react`解析react
+
+```json
+{
+  "presets": [
+    xxx,
+    [
+      "@babel/preset-react"
+    ]
+  ]
+}
+
+```
+
+在`.babelrc` 中添加`preset-react`, 它会从下向上进行逐层解析
+
 ## tree shaking
 
 只打包用到的文件，如：引入文件 main.js ，但是只使用了其中一个方法，默认情况下会全部都进行打包，但是配置了 tree shaking 只会打包用到的文件
