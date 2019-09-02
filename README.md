@@ -474,7 +474,7 @@ npm install webpack-merge -D
 
 用于通用配置
 
-将 webpack.config.js 分解成 webpack.dev.js 和 webpack.prod.js 两个配置文件，用于打包不同环境的配置，
+将 webpack.dev.js 分解成 webpack.dev.js 和 webpack.prod.js 两个配置文件，用于打包不同环境的配置，
 
 因为很多配置既要在开发环境用到也要在生成环境中用到，所以将共有属性抽取出来，建一个 webpack.common.js 
 
