@@ -4,8 +4,8 @@ const path = require('path')
 const webpack = require('webpack')
 
 module.exports = {
-  mode: 'development', // 打包环境，开发还是生产(development or production)
-  devtool: 'cheap-module-eval-source-map',
+  mode: 'production', // 打包环境，开发还是生产(development or production)
+  devtool: 'cheap-module-source-map',
   entry: { // 入口文件
     main: './src/index.js' // 文件名为main.js
   },
@@ -75,6 +75,9 @@ module.exports = {
     }), // 指定html模板文件
     new webpack.HotModuleReplacementPlugin() // HMR
   ],
+  optimization: {
+    usedExports: true
+  },
   output: { // 出口文件
     filename: '[name].bundle.js', // 输出文件名
     path: path.resolve(__dirname, 'dist') // 输出文件路径 __dirname为webpack.config当前文件

@@ -436,14 +436,14 @@ npm install --save-dev @babel/preset-react
 
 ## tree shaking
 
-只打包用到的文件，如：引入文件 main.js ，但是只使用了其中一个方法，默认情况下会全部都进行打包，但是配置了 tree shaking 只会打包用到的文件
+只支持ES Module(静态)，只打包用到的文件，如：引入文件 math.js ，但是只使用了其中一个方法，默认情况下会全部都进行打包，但是配置了 tree shaking 只会打包用到的文件
 
 **环境配置**
 
 在 webpack.common.js 文件中添加下面代码
 
 ```javascript
-optimization: {
+optimization: { // 开发环境可以省略不写，会默认添加
   usedExports: true
 }
 ```
@@ -456,11 +456,17 @@ optimization: {
 
 **配置忽略**
 
-如果要打包的文件都会进行输出，在 package.json 文件中添加 "sideEffects":  false 即可，但是更多的情况我们需要配置忽略，将他们写入数组中：如："@babel/polly-fill"，"*.css" 等
+如果要打包的文件都会进行输出，在 `package.json` 文件中添加 `"sideEffects":  false` 
+
+```json
+"sideEffects":  false // 全部需要检测，没有导出的文件会被忽略
+
+"sideEffects": ["@babel/polly-fill"，"*.css"] // 配置忽略,不进行检测
+```
 
 
 
-## 开发和生成环境代码分离
+## 开发和生产环境代码分离
 
 ```bash
 npm install webpack-merge -D
