@@ -3,7 +3,10 @@
   "version": "1.0.0",
   "description": "学习webpack",
   "private": true,
-  "sideEffects":  false,
+  "sideEffects": [
+    "@babel/polly-fill",
+    "*.css"
+  ],
   "dependencies": {
     "@babel/polyfill": "^7.4.4",
     "@babel/runtime": "^7.5.5",
@@ -30,11 +33,12 @@
     "sass-loader": "^7.3.1",
     "style-loader": "^1.0.0",
     "url-loader": "^2.1.0",
-    "webpack-dev-server": "^3.8.0"
+    "webpack-dev-server": "^3.8.0",
+    "webpack-merge": "^4.2.2"
   },
   "scripts": {
-    "bundle": "webpack",
-    "start": "webpack-dev-server"
+    "dev": "webpack-dev-server --config build/webpack.dev.js",
+    "build": "webpack --config build/webpack.prod.js"
   },
   "repository": {
     "type": "git",
