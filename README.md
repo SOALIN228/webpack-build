@@ -504,23 +504,31 @@ module.exports = merge(commonConfig, devConfig) // 导出配置文件
 
 **同步方式**
 
-同步引入
+- 自己实现
 
-```javascript
-import x from './xxx'
+将类库代码如 `lodash` 和业务代码进行拆分，在`lodash`文件中将其挂载到window上，实现全局访问，这样业务代码更新时，可以通过缓存来加载 `lodash` 只请求更新的业务代码
+
+- 通过webpack自动实现代码分割
+
+根据代码进行自动分割
+
+```js
+optimization: {
+  splitChunks: {
+  	chunks: 'all' // 默认为 async
+  }
+}
 ```
 
 **异步方式**
 
-可以做懒加载，只有在用到的时候才会进行加载
+可以做懒加载，只有在用到的时候才会进行加载(首屏优化，进行代码分割，路由懒加载，用到的时候才会加载)
 
 ```bash
 npm install @babel/plugin-syntax-dynamic-import -D
 ```
 
-引入 babel 预编译文件
-
-在 .babelrc 文件中添加下面代码
+引入 babel 预编译文件,在 `.babelrc` 文件中添加下面代码
 
 ```json
 "plugins": [
@@ -528,13 +536,11 @@ npm install @babel/plugin-syntax-dynamic-import -D
 ]
 ```
 
-异步引入
+异步加载`lodash`
 
-/* webpackChunkName:"lodash" */ 定义打包后文件的名字
-
-```javascript
+```js
 function getComponent () {
-  return import(/* webpackChunkName:"lodash" */'lodash').then(_ => {
+  return import('lodash').then(({ default: _ }) => {
     let element = document.createElement('div')
     element.innerHTML = _.join(['Hello', 'webpack'], '-')
     return element
@@ -544,6 +550,16 @@ function getComponent () {
 getComponent().then(element => {
   document.body.append(element)
 })
+```
+
+`webpackChunkName:"lodash"`  定义打包后文件的名字
+
+```javascript
+function getComponent () {
+  return import(/* webpackChunkName:"lodash" */'lodash').then(({ default: _ }) => {
+    ...
+  })
+}
 ```
 
 webpack 中添加如下代码
@@ -566,7 +582,8 @@ optimization: {
       },
       default: { // 对不在node_modules中的文件进行打包
         priority: -20,
-        reuseExistingChunk: true // 忽略已经打包过的共用代码
+        reuseExistingChunk: true, // 忽略已经打包过的共用代码
+        name: 'common'
       }
     }
   }
@@ -583,6 +600,8 @@ optimization: {
 }
 ```
 
+通过使用异步来实现代码的加载，提高代码的利用率，但是这样每次加载新的页面速度会变慢，所以通过设置 webpackPrefetch: true  当页面带宽有剩余时，自动加载，提高性能
+
 ```javascript
 document.addEventListener('click', () => {
   import(/* webpackPrefetch: true */ './click.js').then(({default: func}) => {
@@ -591,8 +610,15 @@ document.addEventListener('click', () => {
 })
 ```
 
-/* webpackPrefetch: true */ 当页面带宽有剩余时，自动加载
+## webpack打包分析
 
+生成打包的`json`文件
+
+```bash
+webpack --profile --json > stats.json
+```
+
+将json文件，传入[分析网站](http://webpack.github.io/analyse/)获取分析结果
 
 
 ## CSS打包
