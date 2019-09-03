@@ -1,3 +1,6 @@
-import './style.css'
+import $ from 'jquery'
+import _ from 'lodash'
 
-console.log('1234')
+import { ui } from './jquery.ui'
+
+ui()

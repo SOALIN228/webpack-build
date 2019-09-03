@@ -1,5 +1,6 @@
 const { CleanWebpackPlugin } = require('clean-webpack-plugin') // 引入
 const HtmlWebpackPlugin = require('html-webpack-plugin') // 通过插件生成html模板
+const webpack = require('webpack')
 const path = require('path')
 
 module.exports = {
@@ -11,7 +12,9 @@ module.exports = {
       {
         test: /\.js$/,
         exclude: /node_modules/, // 对node_modules中的JS进行忽略
-        loader: 'babel-loader'
+        use: [{
+          loader: 'babel-loader'
+        }]
       },
       {
         test: /\.(png|svg|jpg|gif)$/,
@@ -36,7 +39,11 @@ module.exports = {
     new CleanWebpackPlugin(), // 自动清空输出文件
     new HtmlWebpackPlugin({
       template: 'src/index.html'
-    }) // 指定html模板文件
+    }), // 指定html模板文件
+    new webpack.ProvidePlugin({
+      $: 'jQuery', // 自动引入jquery
+      _join: ['lodash', 'join'] // 使用_join时自动引入lodash中的join
+    })
   ],
   optimization: {
     usedExports: true,
