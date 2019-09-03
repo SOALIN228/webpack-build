@@ -610,6 +610,14 @@ document.addEventListener('click', () => {
 })
 ```
 
+指定入口文件拆分后名字格式
+
+```js
+output: { // 出口文件
+  chunkFilename: '[name].chunk.js', // 入口文件拆分后名字格式
+}
+```
+
 ## webpack打包分析
 
 生成打包的`json`文件
@@ -621,9 +629,9 @@ webpack --profile --json > stats.json
 将json文件，传入[分析网站](http://webpack.github.io/analyse/)获取分析结果
 
 
-## CSS打包
+## CSS代码拆分
 
-将css代码打包到css文件中
+将css代码拆分打包到css文件中
 
 ```bash
 npm install mini-css-extract-plugin -D
@@ -632,15 +640,33 @@ npm install mini-css-extract-plugin -D
 ```javascript
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 
-{
-  test: /\.css$/,
-    use: [
-      MiniCssExtractPlugin.loader, // 替换style-loader
-      'css-loader',
-      'postcss-loader'
-    ]
-}
-
+module: {
+  rules: [
+    {
+      test: /\.css$/,
+      use: [
+        MiniCssExtractPlugin.loader, // 替换style-loader
+        'css-loader',
+        'postcss-loader'
+      ]
+    },
+    {
+      test: /\.scss$/,
+      use: [
+        MiniCssExtractPlugin.loader, // 替换style-loader
+        {
+          loader: 'css-loader', // 打包css
+          options: {
+            importLoaders: 2, // 在调用当前loader(CSS)之前，要调用两个loader(postcss 和 sass)
+            modules: true // 模块化打包css
+          }
+        },
+        'postcss-loader', // 支持插件
+        'sass-loader' // 打包sass
+      ]
+    }
+  ]
+},
 plugins: [
   new MiniCssExtractPlugin({ // 打包css
     filename: '[name].css',

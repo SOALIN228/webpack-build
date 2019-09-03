@@ -9,29 +9,6 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.css$/,
-        use: [
-          'style-loader',
-          'css-loader',
-          'postcss-loader'
-        ]
-      },
-      {
-        test: /\.scss$/,
-        use: [
-          'style-loader', // 添加到head顶部
-          {
-            loader: 'css-loader', // 打包css
-            options: {
-              importLoaders: 2, // 在调用当前loader(CSS)之前，要调用两个loader(postcss 和 sass)
-              modules: true // 模块化打包css
-            }
-          },
-          'postcss-loader', // 支持插件
-          'sass-loader' // 打包sass
-        ]
-      },
-      {
         test: /\.js$/,
         exclude: /node_modules/, // 对node_modules中的JS进行忽略
         loader: 'babel-loader'
@@ -62,6 +39,7 @@ module.exports = {
     }) // 指定html模板文件
   ],
   optimization: {
+    chunks: 'all', // 默认为 async
     splitChunks: { // 代码分割
       chunks: 'all', // initial同步代码分割 async异步代码分割 all全部代码分割
       minSize: 30000, // 超过30000字节才会进行打包
@@ -84,7 +62,7 @@ module.exports = {
   },
   output: { // 出口文件
     filename: '[name].js', // 输出文件名
-    path:
-      path.resolve(__dirname, '../dist') // 输出文件路径 __dirname为webpack.config当前文件
+    chunkFilename: '[name].chunk.js', // 入口文件拆分后名字格式
+    path: path.resolve(__dirname, '../dist') // 输出文件路径 __dirname为webpack.config当前文件
   }
 }
