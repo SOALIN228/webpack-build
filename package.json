@@ -43,9 +43,9 @@
     "webpack-merge": "^4.2.2"
   },
   "scripts": {
-    "dev": "webpack-dev-server --config build/webpack.dev.js",
-    "dev-build": "webpack --config build/webpack.dev.js",
-    "build": "webpack --config build/webpack.prod.js"
+    "dev-build": "webpack --config ./build/webpack.common.js",
+    "dev": "webpack-dev-server --config ./build/webpack.common.js",
+    "build": "webpack --env.production --config ./build/webpack.common.js"
   },
   "repository": {
     "type": "git",
