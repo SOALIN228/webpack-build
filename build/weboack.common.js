@@ -39,7 +39,7 @@ module.exports = {
     }) // 指定html模板文件
   ],
   optimization: {
-    chunks: 'all', // 默认为 async
+    usedExports: true,
     splitChunks: { // 代码分割
       chunks: 'all', // initial同步代码分割 async异步代码分割 all全部代码分割
       minSize: 30000, // 超过30000字节才会进行打包
@@ -61,8 +61,6 @@ module.exports = {
     }
   },
   output: { // 出口文件
-    filename: '[name].js', // 输出文件名
-    chunkFilename: '[name].chunk.js', // 入口文件拆分后名字格式
     path: path.resolve(__dirname, '../dist') // 输出文件路径 __dirname为webpack.config当前文件
   }
 }

@@ -41,6 +41,10 @@ const prodConfig = {
   ],
   optimization: {
     minimizer: [new OptimizeCSSAssetsPlugin({})] // css代码压缩
+  },
+  output: {
+    filename: '[name].[contenthash].js', // 输出文件名
+    chunkFilename: '[name].[contenthash].js', // 入口文件拆分后名字格式
   }
 }
 

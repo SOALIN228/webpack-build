@@ -45,8 +45,9 @@ const devConfig = {
   plugins: [
     new webpack.HotModuleReplacementPlugin() // HMR
   ],
-  optimization: { // tree shaking
-    usedExports: true
+  output: {
+    filename: '[name].js', // 输出文件名
+    chunkFilename: '[name].chunk.js', // 入口文件拆分后名字格式
   }
 }
 
