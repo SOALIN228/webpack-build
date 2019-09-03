@@ -1,6 +1,4 @@
 const webpack = require('webpack')
-const merge = require('webpack-merge')
-const commonConfig = require('./weboack.common')
 
 const devConfig = {
   mode: 'development', // 打包环境，开发还是生产(development or production)
@@ -51,4 +49,4 @@ const devConfig = {
   }
 }
 
-module.exports = merge(commonConfig, devConfig) // 合并
+module.exports = devConfig

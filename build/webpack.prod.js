@@ -1,5 +1,3 @@
-const merge = require('webpack-merge')
-const commonConfig = require('./weboack.common')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin')
 
@@ -48,4 +46,4 @@ const prodConfig = {
   }
 }
 
-module.exports = merge(commonConfig, prodConfig) // 合并
+module.exports = prodConfig

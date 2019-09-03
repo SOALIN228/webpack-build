@@ -1,9 +1,12 @@
 const { CleanWebpackPlugin } = require('clean-webpack-plugin') // 引入
 const HtmlWebpackPlugin = require('html-webpack-plugin') // 通过插件生成html模板
-const webpack = require('webpack')
 const path = require('path')
+const webpack = require('webpack')
+const merge = require('webpack-merge')
+const devConfig = require('./webpack.dev')
+const prodConfig = require('./webpack.prod')
 
-module.exports = {
+const commonConfig = {
   entry: { // 入口文件
     main: './src/index.js' // 文件名为main.js
   },
@@ -69,5 +72,13 @@ module.exports = {
   },
   output: { // 出口文件
     path: path.resolve(__dirname, '../dist') // 输出文件路径 __dirname为webpack.config当前文件
+  }
+}
+
+module.exports = (env) => {
+  if (env && env.production) {
+    return merge(commonConfig, prodConfig)
+  } else {
+    return merge(commonConfig, devConfig)
   }
 }

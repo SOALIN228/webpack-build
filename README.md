@@ -769,3 +769,25 @@ npm install imports-loader -D
 }
 ```
 
+## 另一种环境配置的方法
+
+通过env来传递参数
+
+```bash
+"dev-build": "webpack --config ./build/webpack.common.js",
+"dev": "webpack-dev-server --config ./build/webpack.common.js",
+"build": "webpack --env.production --config ./build/webpack.common.js"
+```
+
+在`webpack.common.js`中根据环境进行输出
+
+```js
+module.exports = (env) => {
+  if (env && env.production) {
+    return merge(commonConfig, prodConfig)
+  } else {
+    return merge(commonConfig, devConfig)
+  }
+}
+```
+
