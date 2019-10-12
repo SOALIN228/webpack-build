@@ -791,3 +791,12 @@ module.exports = (env) => {
 }
 ```
 
+## 打包一个library
+
+```js
+output: {
+  library: "MyLibrary", // 可以通过script 方式引入
+  libraryTarget: "umd", // 支持import require 等引入方式
+}，
+externals: 'lodash' // 将loadash 库忽略，不打包进项目中
+```
