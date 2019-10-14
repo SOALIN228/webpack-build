@@ -1,7 +1,6 @@
 const { CleanWebpackPlugin } = require('clean-webpack-plugin') // 引入
 const HtmlWebpackPlugin = require('html-webpack-plugin') // 通过插件生成html模板
 const path = require('path')
-const webpack = require('webpack')
 const merge = require('webpack-merge')
 const devConfig = require('./webpack.dev')
 const prodConfig = require('./webpack.prod')
@@ -31,7 +30,7 @@ const commonConfig = {
         }
       },
       {
-        test: /\.(woff|woff2|eot|svg|ttf|otf)$/, // 字体格式
+        test: /\.(woff|woff2|eot|ttf|otf)$/, // 字体格式
         use: [{
           loader: 'file-loader'
         }]
@@ -42,11 +41,7 @@ const commonConfig = {
     new CleanWebpackPlugin(), // 自动清空输出文件
     new HtmlWebpackPlugin({
       template: 'src/index.html'
-    }), // 指定html模板文件
-    new webpack.ProvidePlugin({
-      $: 'jQuery', // 自动引入jquery
-      _join: ['lodash', 'join'] // 使用_join时自动引入lodash中的join
-    })
+    }) // 指定html模板文件
   ],
   optimization: {
     usedExports: true,

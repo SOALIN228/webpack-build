@@ -4,7 +4,7 @@ const devConfig = {
   mode: 'development', // 打包环境，开发还是生产(development or production)
   devtool: 'cheap-module-eval-source-map',
   devServer: {
-    contentBase: './dist', // 打开文件路径
+    contentBase: false, // 打开文件路径
     open: true, // 自动打开页面
     port: 8080, // 指定端口号
     hot: true, // 开启热更新

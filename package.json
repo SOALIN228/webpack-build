@@ -40,10 +40,11 @@
     "style-loader": "^1.0.0",
     "url-loader": "^2.1.0",
     "webpack-dev-server": "^3.8.0",
-    "webpack-merge": "^4.2.2"
+    "webpack-merge": "^4.2.2",
+    "workbox-webpack-plugin": "^4.3.1"
   },
   "scripts": {
-    "dev-build": "webpack --config ./build/webpack.common.js",
+    "server": "live-server dist",
     "dev": "webpack-dev-server --config ./build/webpack.common.js",
     "build": "webpack --env.production --config ./build/webpack.common.js"
   },

@@ -800,3 +800,41 @@ output: {
 }，
 externals: 'lodash' // 将loadash 库忽略，不打包进项目中
 ```
+
+## PWA
+
+```bash
+npm install workbox-webpack-plugin -D
+```
+
+安装谷歌plugin
+
+```js
+const WorkboxPlugin = require('workbox-webpack-plugin') // PWA
+
+plugins: [ 
+  new WorkboxPlugin.GenerateSW({
+  	clientsClaim: true,
+  	skipWaiting: true
+  })
+]
+```
+
+配置PWA
+
+```js
+// index.js
+if ('serviceWorker' in navigator) { // 是否支持serviceWorker
+  window.addEventListener('load', () => {
+    // 打包后生成service-worker.js
+    navigator.serviceWorker.register('./service-worker.js')
+    .then(registration => { // 开启成功，将页面缓存
+      console.log('service-worker registed')
+    }).catch(error => {
+      console.log('service-worker registed error')
+    })
+  })
+}
+```
+
+业务应用
