@@ -10,7 +10,13 @@ const devConfig = {
     hot: true, // 开启热更新
     // hotOnly: true, // HMR失效也不刷新浏览器
     proxy: { // 跨域代理
-      '/api': 'http://localhost:3000'
+      '/api': {
+        target: 'http://localhost:3000', // 路径重定型
+        pathRewrite: { // 请求header 被重定向为demo
+          'header.json': 'demo.json'
+        },
+        changeOrigin: true // 可以获取到origin 内容
+      }
     }
   },
   module: {
