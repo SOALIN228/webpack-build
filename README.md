@@ -838,3 +838,45 @@ if ('serviceWorker' in navigator) { // 是否支持serviceWorker
 ```
 
 业务应用
+
+## TypeScript
+
+```bash
+npm install ts-loader typescript -D
+```
+
+```js
+module: {
+  rules: [{
+    test: /\.tsx/,
+    use: 'ts-loader',
+    exclude: /node_modules/
+  }]
+}
+```
+
+还需要配置`tsconfig.json` 才可以正常使用
+
+```json
+{
+  "compilerOptions": {
+    "outDir": "./dist", // 输出文件路径
+    "module": "es6", // 设置在ts 文件中支持es6 写法
+    "target": "es5", // 打包生成es5
+    "allowJs": true // 页面中支持js 文件的引入
+  }
+}
+```
+
+使用`lodash` 库需要添加类型支持库文件，格式为`@types/xxx`
+
+```bash
+npm install @types/lodash -D
+```
+
+**添加ts 类支持后要使用 * as 写法**
+
+```js
+import * as _ from 'lodash'
+```
+
