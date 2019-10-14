@@ -15,7 +15,8 @@ const devConfig = {
         pathRewrite: { // 请求header 被重定向为demo
           'header.json': 'demo.json'
         },
-        changeOrigin: true // 可以获取到origin 内容
+        changeOrigin: true, // 可以获取到origin 内容
+        historyApiFallback: true // 单页应用跳转路由，默认以接口形式打开，配置后如果找不到将以页面形式打开
       }
     }
   },
