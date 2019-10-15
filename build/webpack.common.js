@@ -14,9 +14,7 @@ const commonConfig = {
       {
         test: /\.js$/,
         exclude: /node_modules/, // 对node_modules中的JS进行忽略
-        use: [{
-          loader: 'babel-loader'
-        }]
+        use: ['babel-loader', 'eslint-loader']
       },
       {
         test: /\.(png|svg|jpg|gif)$/,

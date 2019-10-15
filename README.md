@@ -889,3 +889,47 @@ npm install @types/lodash -D
 import * as _ from 'lodash'
 ```
 
+## EsLint
+
+```bash
+npm install eslint eslint-lader -D
+```
+
+安装`eslint`
+
+```bash
+npx eslint --init
+```
+
+`eslint` 文件初始化
+
+选择 `standard` 的规范
+
+```js
+{
+  test: /\.js$/,
+  exclude: /node_modules/, // 对node_modules中的JS进行忽略
+  use: ['babel-loader', 'eslint-loader'] // 先执行eslint 在执行babel
+}
+```
+
+```bash
+npm install babel-eslint -D
+```
+
+```js
+// .eslintrc.js
+parserOptions: { // 使用babel-eslint 做编译器
+  parser: 'babel-eslint'
+}
+```
+
+```js
+devServer: {
+  overlay: true, // 将eslint 错误显示在页面上
+}
+```
+
+设置`.editorconfig`
+
+优先级会高于编译器的默认配置，如果无效将编译器的查找文件删掉，再次生成就会读取了
