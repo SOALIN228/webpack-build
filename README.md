@@ -457,7 +457,7 @@ optimization: { // 开发环境可以省略不写，会默认添加
 }
 ```
 
-**注：**开发环境下还是会全部进行打包，但是会标记用到了哪些，生产环境则只打包用到的
+**注:** 开发环境下还是会全部进行打包，但是会标记用到了哪些，生产环境则只打包用到的
 
 **生产环境配置**
 
@@ -470,7 +470,7 @@ optimization: { // 开发环境可以省略不写，会默认添加
 ```json
 "sideEffects":  false // 全部需要检测，没有导出的文件会被忽略
 
-"sideEffects": ["@babel/polly-fill"，"*.css"] // 配置忽略,不进行检测
+"sideEffects": ["@babel/polly-fill","*.css"] // 配置忽略,不进行检测
 ```
 
 
@@ -519,15 +519,15 @@ module.exports = merge(commonConfig, devConfig) // 导出配置文件
 
 - 通过webpack自动实现代码分割
 
-根据代码进行自动分割
+  根据代码进行自动分割
 
-```js
-optimization: {
-  splitChunks: {
-  	chunks: 'all' // 默认为 async
+  ```js
+  optimization: {
+    splitChunks: {
+      chunks: 'all' // 默认为 async
+    }
   }
-}
-```
+  ```
 
 **异步方式**
 
@@ -604,7 +604,7 @@ optimization: {
 ```javascript
 optimization: {
   splitChunks: {
-  	chunks: 'all' // 默认为 async
+    chunks: 'all' // 默认为 async
   }
 }
 ```
@@ -806,7 +806,7 @@ module.exports = (env) => {
 output: {
   library: "MyLibrary", // 可以通过script 方式引入
   libraryTarget: "umd", // 支持import require 等引入方式
-}，
+},
 externals: 'lodash' // 将loadash 库忽略，不打包进项目中
 ```
 

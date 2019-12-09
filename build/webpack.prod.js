@@ -47,7 +47,7 @@ const prodConfig = {
   },
   output: {
     filename: '[name].[contenthash].js', // 输出文件名
-    chunkFilename: '[name].[contenthash].js', // 入口文件拆分后名字格式
+    chunkFilename: '[name].[contenthash].js' // 入口文件拆分后名字格式
   }
 }
 

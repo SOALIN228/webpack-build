@@ -53,7 +53,7 @@ const devConfig = {
   ],
   output: {
     filename: '[name].js', // 输出文件名
-    chunkFilename: '[name].chunk.js', // 入口文件拆分后名字格式
+    chunkFilename: '[name].chunk.js' // 入口文件拆分后名字格式
   }
 }
 
