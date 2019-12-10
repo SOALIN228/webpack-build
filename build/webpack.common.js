@@ -5,30 +5,40 @@ const HtmlWebpackPlugin = require('html-webpack-plugin') // 通过插件生成ht
 const AddAssetHtmlPlugin = require('add-asset-html-webpack-plugin')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin') // 引入
 
-const plugins = [
-  new CleanWebpackPlugin(), // 自动清空输出文件
-  new HtmlWebpackPlugin({ // 指定html模板文件
-    template: 'src/index.html'
+const makePlugins = (configs) => {
+  const plugins = [
+    new CleanWebpackPlugin() // 自动清空输出文件
+  ]
+  Object.keys(configs.entry).forEach(item => {
+    plugins.push(
+      new HtmlWebpackPlugin({ // 指定html模板文件
+        template: 'src/index.html',
+        filename: `${item}.html`,
+        chunks: ['vendors', item] // 指定引入文件
+      })
+    )
   })
-]
+  const files = fs.readdirSync(path.resolve(__dirname, '../dll'))
+  files.forEach(file => {
+    if (/.*\.dll\.js/.test(file)) {
+      plugins.push(new AddAssetHtmlPlugin({ // 向html模板文件中添加打包后第三方库代码包
+        filepath: path.resolve(__dirname, '../dll', file)
+      }))
+    }
+    if (/.*\.manifest\.json/.test(file)) {
+      // 如果第三方库代码包中包含该库，则使用代码包中代码，提升打包速度
+      plugins.push(new webpack.DllReferencePlugin({
+        manifest: path.resolve(__dirname, '../dll', file)
+      }))
+    }
+  })
+  return plugins
+}
 
-const files = fs.readdirSync(path.resolve(__dirname, '../dll'))
-files.forEach(file => {
-  if (/.*\.dll\.js/.test(file)) {
-    plugins.push(new AddAssetHtmlPlugin({ // 向html模板文件中添加打包后第三方库代码包
-      filepath: path.resolve(__dirname, '../dll', file)
-    }))
-  }
-  if (/.*\.manifest\.json/.test(file)) {
-    plugins.push(new webpack.DllReferencePlugin({ // 如果第三方库代码包中包含该库，则使用代码包中代码，提升打包速度
-      manifest: path.resolve(__dirname, '../dll', file)
-    }))
-  }
-})
-
-module.exports = {
+const configs = {
   entry: { // 入口文件
-    main: './src/index.js' // 文件名为main.js
+    index: './src/index.js',
+    list: './src/list.js'
   },
   output: { // 出口文件
     path: path.resolve(__dirname, '../dist') // 输出文件路径 __dirname为webpack.config当前文件
@@ -79,6 +89,9 @@ module.exports = {
         }
       }
     }
-  },
-  plugins
+  }
 }
+
+configs.plugins = makePlugins(configs)
+
+module.exports = configs
