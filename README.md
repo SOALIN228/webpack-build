@@ -933,3 +933,10 @@ devServer: {
 设置`.editorconfig`
 
 优先级会高于编译器的默认配置，如果无效将编译器的查找文件删掉，再次生成就会读取了
+
+## 性能优化
+
+1. 使用`exclude`和`include`,减少`loader`检查的代码数量和嵌套层数
+2. 去除不必要的`plugins`
+3. 减少`resolve`中不必要的配置，如：`extensions`后缀的数量不要过多
+4. 将使用到的第三方库文件单独打包，使用`add-asset-html-webpack-plugin`将第三方库文件添加到html模板文件中，使用`webpack`中的`DllPlugin` 生成第三方代码库的分析文件，使用`webpack`中的`DllReferencePlugin`执行分析文件，如果已经打包过，则直接使用打包的库文件，这样只会打包一次，提升打包速度

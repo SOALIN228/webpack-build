@@ -1,11 +1,17 @@
-console.log(123)
-if ('serviceWorker' in navigator) { // 是否支持serviceWorker
-  window.addEventListener('load', () => {
-    // 打包后生成service-worker.js
-    navigator.serviceWorker.register('./service-worker.js').then(registration => { // 开启成功，将页面缓存
-      console.log('service-worker registed')
-    }).catch(err => {
-      console.log('service-worker registed error' + err)
-    })
-  })
+// eslint-disable-next-line no-unused-vars
+import React, { Component } from 'react'
+import ReactDom from 'react-dom'
+import _ from 'lodash'
+
+// eslint-disable-next-line no-unused-vars
+class App extends Component {
+  render () {
+    return (
+      <div>
+        <div>{_.join(['this', 'is', 'app'], '')}</div>
+      </div>
+    )
+  }
 }
+
+ReactDom.render(<App/>, document.getElementById('root'))

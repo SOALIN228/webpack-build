@@ -1,18 +1,49 @@
-const { CleanWebpackPlugin } = require('clean-webpack-plugin') // 引入
-const HtmlWebpackPlugin = require('html-webpack-plugin') // 通过插件生成html模板
 const path = require('path')
-const merge = require('webpack-merge')
-const devConfig = require('./webpack.dev')
-const prodConfig = require('./webpack.prod')
+const fs = require('fs')
+const webpack = require('webpack')
+const HtmlWebpackPlugin = require('html-webpack-plugin') // 通过插件生成html模板
+const AddAssetHtmlPlugin = require('add-asset-html-webpack-plugin')
+const { CleanWebpackPlugin } = require('clean-webpack-plugin') // 引入
 
-const commonConfig = {
+const plugins = [
+  new CleanWebpackPlugin(), // 自动清空输出文件
+  new HtmlWebpackPlugin({ // 指定html模板文件
+    template: 'src/index.html'
+  })
+]
+
+const files = fs.readdirSync(path.resolve(__dirname, '../dll'))
+files.forEach(file => {
+  if (/.*\.dll\.js/.test(file)) {
+    plugins.push(new AddAssetHtmlPlugin({ // 向html模板文件中添加打包后第三方库代码包
+      filepath: path.resolve(__dirname, '../dll', file)
+    }))
+  }
+  if (/.*\.manifest\.json/.test(file)) {
+    plugins.push(new webpack.DllReferencePlugin({ // 如果第三方库代码包中包含该库，则使用代码包中代码，提升打包速度
+      manifest: path.resolve(__dirname, '../dll', file)
+    }))
+  }
+})
+
+module.exports = {
   entry: { // 入口文件
     main: './src/index.js' // 文件名为main.js
+  },
+  output: { // 出口文件
+    path: path.resolve(__dirname, '../dist') // 输出文件路径 __dirname为webpack.config当前文件
+  },
+  resolve: {
+    extensions: ['.js', '.jsx'], // 省略文件后缀，将按规则查找
+    alias: { // 别名
+      '@': path.resolve(__dirname, '../src/style')
+    }
   },
   module: {
     rules: [
       {
-        test: /\.js$/,
+        test: /\.jsx?$/, // 匹配js和jsx
+        include: path.resolve(__dirname, '../src'), // 只检查src目录下文件，提升打包速度
         exclude: /node_modules/, // 对node_modules中的JS进行忽略
         use: ['babel-loader', 'eslint-loader']
       },
@@ -35,43 +66,19 @@ const commonConfig = {
       }
     ]
   },
-  plugins: [
-    new CleanWebpackPlugin(), // 自动清空输出文件
-    new HtmlWebpackPlugin({
-      template: 'src/index.html'
-    }) // 指定html模板文件
-  ],
+  performance: false, // 忽略性能警告
   optimization: {
     usedExports: true,
     splitChunks: { // 代码分割
       chunks: 'all', // initial同步代码分割 async异步代码分割 all全部代码分割
-      minSize: 30000, // 超过30000字节才会进行打包
-      minChunks: 1, // 打包后被chunk引用次数大于等于1，会单独打包成一个文件
-      maxAsyncRequests: 5, // 最多分割5个文件
-      maxInitialRequests: 3, // 入口文件引入的库最多分割3个文件
-      automaticNameDelimiter: '~', // 代码连接符
-      name: true, // vendors 和 default 起的名字有效
       cacheGroups: {
         vendors: {
           test: /[\\/]node_modules[\\/]/, // 对node_modules中的文件进行打包
+          name: 'vendors',
           priority: -10 // 优先级
-        },
-        default: { // 对不在node_modules中的文件进行打包
-          priority: -20,
-          reuseExistingChunk: true // 忽略已经打包过的共用代码,直接使用打包过的文件
         }
       }
     }
   },
-  output: { // 出口文件
-    path: path.resolve(__dirname, '../dist') // 输出文件路径 __dirname为webpack.config当前文件
-  }
-}
-
-module.exports = (env) => {
-  if (env && env.production) {
-    return merge(commonConfig, prodConfig)
-  } else {
-    return merge(commonConfig, devConfig)
-  }
+  plugins
 }

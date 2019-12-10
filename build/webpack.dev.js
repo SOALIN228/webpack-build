@@ -1,8 +1,14 @@
 const webpack = require('webpack')
+const merge = require('webpack-merge')
+const commonConfig = require('./webpack.common')
 
 const devConfig = {
   mode: 'development', // 打包环境，开发还是生产(development or production)
   devtool: 'cheap-module-eval-source-map',
+  output: {
+    filename: '[name].js', // 输出文件名
+    chunkFilename: '[name].chunk.js' // 入口文件拆分后名字格式
+  },
   devServer: {
     overlay: true, // 将eslint 错误显示在页面上
     contentBase: false, // 打开文件路径
@@ -38,8 +44,7 @@ const devConfig = {
           {
             loader: 'css-loader', // 打包css
             options: {
-              importLoaders: 2, // 在调用当前loader(CSS)之前，要调用两个loader(postcss 和 sass)
-              modules: true // 模块化打包css
+              importLoaders: 2 // 在调用当前loader(CSS)之前，要调用两个loader(postcss 和 sass)
             }
           },
           'postcss-loader', // 支持插件
@@ -50,11 +55,7 @@ const devConfig = {
   },
   plugins: [
     new webpack.HotModuleReplacementPlugin() // HMR
-  ],
-  output: {
-    filename: '[name].js', // 输出文件名
-    chunkFilename: '[name].chunk.js' // 入口文件拆分后名字格式
-  }
+  ]
 }
 
-module.exports = devConfig
+module.exports = merge(commonConfig, devConfig)
