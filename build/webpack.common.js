@@ -83,9 +83,15 @@ const configs = {
       chunks: 'all', // initial同步代码分割 async异步代码分割 all全部代码分割
       cacheGroups: {
         vendors: {
-          test: /[\\/]node_modules[\\/]/, // 对node_modules中的文件进行打包
           name: 'vendors',
+          test: /[\\/]node_modules[\\/]/, // 对node_modules中的文件进行打包
           priority: -10 // 优先级
+        },
+        default: { // 对本地文件进行打包
+          name: 'default',
+          minChunks: 2,
+          priority: -20,
+          reuseExistingChunk: true
         }
       }
     }

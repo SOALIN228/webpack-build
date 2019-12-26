@@ -465,7 +465,7 @@ optimization: { // 开发环境可以省略不写，会默认添加
 
 **配置忽略**
 
-如果要打包的文件都会进行输出，在 `package.json` 文件中添加 `"sideEffects":  false` 
+如果要打包的文件都会进行输出，在 `package.json` 文件中添加 `"sideEffects":  false`
 
 ```json
 "sideEffects":  false // 全部需要检测，没有导出的文件会被忽略
@@ -485,7 +485,7 @@ npm install webpack-merge -D
 
 将 webpack.dev.js 分解成 webpack.dev.js 和 webpack.prod.js 两个配置文件，用于打包不同环境的配置，
 
-因为很多配置既要在开发环境用到也要在生成环境中用到，所以将共有属性抽取出来，建一个 webpack.common.js 
+因为很多配置既要在开发环境用到也要在生成环境中用到，所以将共有属性抽取出来，建一个 webpack.common.js
 
 ```javascript
 const merge = require('webpack-merge') // 用于通用配置
@@ -780,19 +780,11 @@ npm install imports-loader -D
 
 ## 另一种环境配置的方法
 
-通过env来传递参数
-
-```bash
-"dev-build": "webpack --config ./build/webpack.common.js",
-"dev": "webpack-dev-server --config ./build/webpack.common.js",
-"build": "webpack --env.production --config ./build/webpack.common.js"
-```
-
 在`webpack.common.js`中根据环境进行输出
 
 ```js
-module.exports = (env) => {
-  if (env && env.production) {
+module.exports = () => {
+  if (process.env.NODE_ENV === 'production') {
     return merge(commonConfig, prodConfig)
   } else {
     return merge(commonConfig, devConfig)
@@ -821,7 +813,7 @@ npm install workbox-webpack-plugin -D
 ```js
 const WorkboxPlugin = require('workbox-webpack-plugin') // PWA
 
-plugins: [ 
+plugins: [
   new WorkboxPlugin.GenerateSW({
   	clientsClaim: true,
   	skipWaiting: true
