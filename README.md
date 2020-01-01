@@ -1,4 +1,5 @@
 # webpackDemo
+
 学习 `webpack`，具体以**文档为准**，不会就**查文档、查文档、查文档**
 
 `webpack` 是一个模块打包工具
@@ -25,7 +26,7 @@ npx webpack -v
 
 
 
-## 配置 entry 和 output
+## 配置entry和output
 
 在 webpack.dev.js 文件中配置
 
@@ -75,10 +76,43 @@ devtool: 'cheap-module-source-map', // 生产环境配置 production
 在 package.json 文件中为 scripts 添加
 
 ```bash
-"build": "webpack"
+"build": "webpack",
+"dev": "webpack-dev-server",
+"server": "live-server ./dist --port=8081"
 ```
 
-可以直接使用 **npm run build** 打包，手动命令为 **npx webpack**
+
+
+## devServer
+
+开启一份服务，将项目打包好运行在内存中，监听文件变动，自动进行**打包**和**页面刷新**，大大提高开发效率
+
+```bash
+npm install webpack-dev-server -D
+```
+
+常用配置
+
+```javascript
+devServer: {
+  contentBase: path.resolve(__dirname, '../dist'), // 打开文件路径
+  open: true, // 自动打开页面
+  port: 8080, // 指定端口号
+  // host: '0.0.0.0', // 开启IP访问模式
+  hot: true, // 开启热更新
+  hotOnly: true, // HMR失效也不刷新浏览器
+  proxy: { // 跨域代理
+    '/api': {
+      target: 'http://localhost:3000', // 路径重定型
+      pathRewrite: { // 请求header 被重定向为demo
+        'header.json': 'demo.json'
+      },
+      changeOrigin: true, // 可以获取到origin 内容，最好一直设置
+      historyApiFallback: true // 单页应用跳转路由，默认以接口形式打开，配置后如果找不到将以页面形式打开
+    }
+  }
+}
+```
 
 
 
@@ -88,31 +122,50 @@ devtool: 'cheap-module-source-map', // 生产环境配置 production
 
 使用各种不同的 loader 就可以让 webpack 支持各种资源的打包
 
-### 打包图片
+### 打包字体
 
 ```bash
-npm install file-loader url-loader -D
+npm install file-loader -D
 ```
 
-url-loader 和 file-loader 功能相似，区别是 url-loader 可以指定当图片小于设置参数时，使用base64打包
-
-**注**：file-loader url-loader 最好都安装，因为在打包 css中的图片时 url-loader 依赖 file-loader
+打包配置
 
 ```javascript
 {
-  test: /\.(png|svg|jpg|gif)$/, // 图片格式
+  test: /\.(woff2?|eot|ttf|otf|svg)$/, // 字体格式
   use: [{
-    loader: 'url-loader', // 使用url-loader打包图片
+    loader: 'file-loader',
     options: {
-      name: '[name]_[hash].[ext]', // 配置打包后的名字 ext为文件扩展名
-      outputPath: 'images/', // 输出路径
-      limit: 20480 // 图片大于2kb使用base64进行打包，减少http请求
+      name: '[name]_[hash].[ext]',
+      outputPath: 'fonts/'
     }
   }]
 }
 ```
 
+### 打包图片
 
+```bash
+npm install url-loader -D
+```
+
+url-loader 和 file-loader 功能相似，区别是 url-loader 可以指定当图片小于设置参数时，使用base64打包
+
+```javascript
+{
+  test: /\.(jpe?g|png|gif)$/, // 图片格式
+  use: [{
+    loader: 'url-loader', // 使用url-loader打包图片
+    options: {
+      name: '[name]_[hash].[ext]', // 配置打包后的名字 ext为文件扩展名
+      outputPath: 'images/', // 输出路径
+      limit: 20480 // 图片大于20kb使用base64进行打包，减少http请求
+    }
+  }]
+}
+```
+
+> url-loader 依赖 file-loader
 
 ### 打包CSS
 
@@ -126,12 +179,6 @@ sass-loader 支持打包 sass
 
 ```bash
 npm install sass-loader node-sass -D
-```
-
-**注**：安装 node-sass 可能会失败，我都换源了还是不行，难受，使用下面方法可以解决
-
-```bash
-npm i node-sass --sass_binary_site=https://npm.taobao.org/mirrors/node-sass/ -D
 ```
 
 postcss-loader 可以安装插件
@@ -156,7 +203,7 @@ module.exports = {
 }
 ```
 
-loader 配置, loaderd 打包从下到上调用 loader
+loader 打包是从下到上逐层调用 loader
 
 ```javascript
 {
@@ -176,52 +223,25 @@ loader 配置, loaderd 打包从下到上调用 loader
 }
 ```
 
-```javascript
-import th from './th.jpg' // 引入图片
-import './index.scss' // 全局引入
-// import style from './index.scss' // 模块引入
-
-var img = new Image()
-img.src = th
-img.classList.add('avatar') // 全局打包
-// img.classList.add(style.avatar) // 模块打包
-
-var root = document.getElementById('root')
-root.append(img)
-```
-
-
-
-### 打包字体
-
-file-loader 和 url-loader 都可以
-
-```javascript
-{
-  test: /\.(woff|woff2|eot|svg|ttf|otf)$/, // 字体格式
-  use: [{
-    loader: 'file-loader'
-  }]
-}
-```
-
 
 
 ## Plugins
 
-帮助 webpack 运行到某个时刻时，帮我做一些事情
+插件，扩展 webpack 的功能
+
+### 配置HTML模版
+
+配置html模版，并将打包后的js引入到模版中
 
 ```bash
 npm install html-webpack-plugin -D
 ```
 
-打包后生成 index.html 文件，并自动将打包的 JS 引入到 index.html 文件中
+每次打包前自动清空dist文件中的无效文件
 
 ```bash
 npm install clean-webpack-plugin -D
 ```
-
-自动清空输出文件中的无效文件
 
 ```javascript
 const { CleanWebpackPlugin } = require("clean-webpack-plugin") // 引入
@@ -233,49 +253,11 @@ plugins: [
 ]
 ```
 
+### 添加热更新 HMR
 
+HMR只做修改内容部分的更新，而不是通过刷新页面达到更新，可以大大提高开发效率
 
-## devServer
-
-监听我们文件，更改后自动帮我们进行**打包**和**页面刷新**，适合**开发中使用**，还有很多非常nice的配置
-
-```bash
-npm install webpack-dev-server -D
-```
-
-安装
-
-```bash
-"start": "webpack-dev-server"
-```
-
-在 package.json 文件中添加命命令，使用 **npm run start** 启动
-
-```javascript
-devServer: {
-  contentBase: './dist', // 打开文件路径
-  open: true, // 自动打开页面
-  port: 8080, // 指定端口号
-  hot: true, // 开启热更新
-  hotOnly: true, // HMR失效也不刷新浏览器
-  proxy: { // 跨域代理
-    '/api': {
-      target: 'http://localhost:3000', // 路径重定型
-      pathRewrite: { // 请求header 被重定向为demo
-        'header.json': 'demo.json'
-      },
-      changeOrigin: true, // 可以获取到origin 内容，最好一直设置
-      historyApiFallback: true // 单页应用跳转路由，默认以接口形式打开，配置后如果找不到将以页面形式打开
-    }
-  }
-}
-```
-
-
-
-## 添加热更新 HMR
-
-在更改 CSS 代码或 JS 代码后，页面会自动刷新，但是我们不想页面刷新，而是将原内容替换为修改过的内容，配置 HMR 可以帮助我们解决这个问题，提升开发效率
+配置 CSS 文件热更新
 
 ```javascript
 const webpack = require('webpack') // 引入
@@ -292,9 +274,7 @@ plugins: [
 ]
 ```
 
-现在我们修改 CSS 文件就不会刷新页面，而且会热更新了
-
-但是修改 JS 文件我们还要配置一点东西
+但是修改 JS 文件需要自己配置如何替换DOM，从而实现HMR
 
 ```javascript
 if (module.hot) { // 页面重新渲染时触发
@@ -305,60 +285,41 @@ if (module.hot) { // 页面重新渲染时触发
 }
 ```
 
-为什么修改 JS 要比修改 CSS 麻烦这么多，为什么 Vue 不需要写这些东西那，因为 style-loade 帮我们在 CSS 中做了上面那些事情，vue-loader 帮我们在 Vue 中做了上面那些事情
-
-
+> 原因是 style-loade 中实现了CSS文件中类似的替换，vue-loader 中实现了 Vue 中类似的替换
 
 ## babel
 
 使用 babel 可以将我们的代码从 es6 或更高的版本，转换成低版本浏览器识别的 JS
 
-```bash
-npm install babel-loader @babel/core -D
-```
-
 添加 loader 和 核心模块
 
 ```bash
-npm install @babel/preset-env -D
+npm install babel-loader @babel/core -D
 ```
 
 将代码转换成 es5
 
 ```bash
-npm install @babel/polyfill core-js@3 --save
+npm install @babel/preset-env -D
 ```
 
-es6 中新增的对象或函数，只靠 preset-env 只能解决一部分，还需要添加 polyfill ，polyfill内部集成了(core-js)
+实现浏览器不支持的js语法
+
+```bash
+npm install core-js regenerator-runtime -S
+```
 
 注：使用'useBuiltIns': 'usage'不需要添加 `import "@babel/polyfill";` ,因为会自动加载
 
 ```javascript
 {
-  test: /\.js$/,
-  exclude: /node_modules/, // 对node_modules中的JS进行忽略
-  loader: 'babel-loader',
-  options: {
-    presets: [ // 插件集合
-      [
-        '@babel/preset-env',
-        {
-          targets: { // 指定兼容浏览器的版本
-            edge: "17",
-            firefox: "60",
-            chrome: "67",
-            safari: "11.1",
-          },
-          useBuiltIns: 'usage', // 按需转入，用到哪些新语法，就添加哪些
-          corejs: 3 // 指定版本,不写会报错，坑
-        }
-      ]
-    ]
-  }
+   test: /\.js$/,
+   exclude: /node_modules/, // 对node_modules中的JS进行忽略
+   loader: "babel-loader"
 }
 ```
 
-如果配置的 babel 属性很多可以新建一个名为 `.babelrc` 的文件，专门存放关于 babel 的配置(json格式，双引号)
+ `.babelrc`  babel 的配置文件
 
 ```json
 {
@@ -366,12 +327,6 @@ es6 中新增的对象或函数，只靠 preset-env 只能解决一部分，还�
     [
       "@babel/preset-env",
       {
-        "targets": {
-          "edge": "17",
-          "firefox": "60",
-          "chrome": "67",
-          "safari": "11.1"
-        },
         "useBuiltIns": "usage",
         "corejs": 3
       }
@@ -380,38 +335,43 @@ es6 中新增的对象或函数，只靠 preset-env 只能解决一部分，还�
 }
 ```
 
-`polyfill` 依赖全局环境，会造成污染，如果自己写组件库，使用 `plugin-transform-runtime`, 以闭包的形式注入，不污染全局属性
+`.browserslistrc` 指定babel打包好支持的浏览器
+
+全球大于1%使用的版本，支持每个浏览器的最后两个版本，如过不考虑ie，可以再格外配置，减少打包后的体积
+
+```
+> 1%
+last 2 versions
+```
+
+`polyfill` 依赖全局环境，会造成污染，如果业务代码，无需考虑
+
+如果是库代码，使用 `plugin-transform-runtime`和`runtime`, 以闭包的形式注入，不污染全局属性
 
 ```bash
 npm install @babel/plugin-transform-runtime -D
 ```
 
 ```bash
-npm install @babel/runtime --save
-```
-
-```bash
-npm install @babel/runtime-corejs3  --save
+npm install @babel/runtime -S
 ```
 
 ```javascript
 {
-  "plugins": [
+  "presets": [
     [
-      "@babel/plugin-transform-runtime",
+      "@babel/preset-env",
       {
-        "absoluteRuntime": false,
-        "corejs": 3,
-        "helpers": true,
-        "regenerator": true,
-        "useESModules": false
+        "useBuiltIns": "usage",
+        "corejs": 3
       }
     ]
+  ],
+  "plugins": [
+    "@babel/plugin-transform-runtime"
   ]
 }
 ```
-
-plugins 同样可以配置到 `.babelrc` 中
 
 
 
@@ -432,16 +392,21 @@ npm install --save-dev @babel/preset-react
 ```json
 {
   "presets": [
-    xxx,
+    [
+      "@babel/preset-env",
+      {
+        "useBuiltIns": "usage",
+        "corejs": 3
+      }
+    ],
     [
       "@babel/preset-react"
     ]
   ]
 }
-
 ```
 
-在`.babelrc` 中添加`preset-react`, 它会从下向上进行逐层解析
+
 
 ## tree shaking
 

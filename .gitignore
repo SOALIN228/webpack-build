@@ -1,7 +1,12 @@
 # Created by .ignore support plugin (hsz.mobi)
-.gitignore
+### Example user template template
+### Example user template
+
+# IntelliJ project files
 .idea
+*.iml
+out
+gen
 node_modules
 dist
-dll
 package-lock.json
