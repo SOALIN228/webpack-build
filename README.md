@@ -1,6 +1,6 @@
-# webpackDemo
+# webpack
 
-学习 `webpack`，具体以**文档为准**，不会就**查文档、查文档、查文档**
+学习 `webpack`笔记，但是因为webpack生态非常丰富，只记录一些常用配置，具体以**文档为准**
 
 `webpack` 是一个模块打包工具
 
@@ -26,23 +26,19 @@ npx webpack -v
 
 
 
-## 配置entry和output
-
-在 webpack.dev.js 文件中配置
+## entry 和 output
 
 ```javascript
 const path = require('path')
 
 module.exports = {
-  mode: 'development', // 打包环境，开发还是生产(development or production)
-  devtool: 'cheap-module-eval-source-map', // 开发环境配置 development
-  // devtool: 'cheap-module-source-map', // 生产环境配置 production
   entry: { // 入口文件
     main: main.js // 文件名为main.js
   },
   output: { // 出口文件
     // publicPath: 'http://cdn.com.cn', // 如果静态文件使用CDN，添加指定CDN路径
     filename: '[name].bundle.js', // 输出文件名
+    chunkFilename: '[name].bundle.chunk.js', // 走splitChunks打包的文件命名
     path: path.resolve(__dirname, 'dist') // 输出文件路径 __dirname为webpack.config当前文件
   }
 }
@@ -50,11 +46,32 @@ module.exports = {
 
 
 
+##  缓存 hash
+
+代码上线后，如果更改代码内容，但是文件名不变的话，浏览器会从缓存中将老版本的文件取出，这就头疼了，还好 webpack 提拱了解决办法
+
+hash：所有文件使用统一的hash，只要一个文件改变，hash就会改变，从而改变所有文件
+
+chunkhash：不同chunk使用与之对应对应的hash，但是同chunk中只要一个文件改变，那么同chunk的其他文件也会改变，不够灵活
+
+contenthash：根据文件的内容来生成hash，这样每一个文件都有独特的hash，只有内容改变，hash才会改变
+
+```javascript
+output: {
+  filename: '[name].[contenthash].js',   
+  chunkFilename: '[name].[contenthash].js'
+}
+```
+
+
+
 ## Source Map
 
-因为代码出错显示的是打包后文件的位置，使用 devtool 配置 source-map 即可显示源文件的出错位置，devtool 会自动帮我们把打包位置文件位置映射到源文件位置
+代码出错显示的是打包后文件的位置，使用 source-map 即可显示源文件的出错位置
 
-五个关键字任意组合，配饰适合我们项目的：
+devtool 会自动帮我们把打包位置文件位置映射到源文件位置
+
+五个关键字任意组合，配置适合我们项目的：
 
 - eval： 使用 eval 包裹模块代码，也不会产生单独的`.map`
 - source-map： 产生`.map`文件(映射)
@@ -71,14 +88,50 @@ devtool: 'cheap-module-source-map', // 生产环境配置 production
 
 
 
+## 开发和生产环境
+
+```bash
+npm install webpack-merge -D
+```
+
+配置 webpack.dev.js 和 webpack.prod.js 两个文件，用于打包不同环境的配置，
+
+因为很多配置既要在开发环境用到也要在生成环境中用到，所以将共有属性抽取出来，建一个 webpack.common.js
+
+```javascript
+const merge = require('webpack-merge') // 用于配置合并
+const commonConfig = require('./webpack.common') // 引入通用文件
+
+const devConfig = {
+    /*...*/
+}
+
+module.exports = merge(commonConfig, devConfig) // 导出配置文件
+```
+
+或者通过NODE_ENV获取当前环境
+
+```js
+module.exports = () => {
+  if (process.env.NODE_ENV === 'production') {
+    return merge(commonConfig, prodConfig)
+  } else {
+    return merge(commonConfig, devConfig)
+  }
+}
+```
+
+
+
 ## 打包命令
 
 在 package.json 文件中为 scripts 添加
 
 ```bash
-"build": "webpack",
-"dev": "webpack-dev-server",
-"server": "live-server ./dist --port=8081"
+"build": "webpack --config build/webpack.prod.js",
+"dev": "webpack-dev-server --config build/webpack.dev.js",
+"server": "live-server ./dist --port=8081",
+"lint": "eslint --ext .js ./src"
 ```
 
 
@@ -103,15 +156,160 @@ devServer: {
   hotOnly: true, // HMR失效也不刷新浏览器
   proxy: { // 跨域代理
     '/api': {
-      target: 'http://localhost:3000', // 路径重定型
-      pathRewrite: { // 请求header 被重定向为demo
-        'header.json': 'demo.json'
+      target: 'http://localhost:3000', // 路径重定向
+      secure: false, // 支持https
+      pathRewrite: { // 请求重定向 请求a接口相当于请求b接口
+        'a.json': 'b.json'
       },
-      changeOrigin: true, // 可以获取到origin 内容，最好一直设置
-      historyApiFallback: true // 单页应用跳转路由，默认以接口形式打开，配置后如果找不到将以页面形式打开
+      changeOrigin: true, // 可以获取到origin 内容，防止被拦截
+      historyApiFallback: true // 单页应用跳转路由，如果找不到将以页面形式打开
     }
   }
 }
+```
+
+
+
+## tree shaking
+
+只支持ES Module(静态)，只打包用到的文件，如：引入文件 math.js ，但是只使用了其中一个方法，默认情况下会全部都进行打包，但是配置了 tree shaking 只会打包用到的文件
+
+**环境配置**
+
+在 webpack.common.js 文件中添加下面代码
+
+```javascript
+optimization: { // 生产环境下会默认添加
+  usedExports: true
+}
+```
+
+**注:** 开发环境下还是会全部进行打包，但是会标记用到了哪些，生产环境则只打包用到的
+
+**配置忽略**
+
+如果要打包的文件都会进行输出，在 `package.json` 文件中添加 `"sideEffects":  false`
+
+```json
+"sideEffects":  false // 全部需要检测，没有导出的文件会被忽略
+
+"sideEffects": ["*.css"] // 配置忽略,不进行检测
+```
+
+
+
+## 代码分割(codeSplit)
+
+将代码都打包到一个文件，首屏会很慢，利用浏览器可以同时加载多个 JS 文件的特性，将代码进行分割，提高加载速度
+
+**自己实现**
+
+将类库代码如 `lodash` 和业务代码进行拆分，将`lodash`挂载到window上，实现全局访问，这样业务代码更新时，通过缓存来加载库代码，只更新的业务代码，提高加载速度
+
+**通过webpack实现代码分割**
+
+默认配置
+
+```js
+optimization: {
+  splitChunks: { // 代码分割
+    chunks: 'async', // initial同步 async异步 all全部
+    minSize: 30000, // 超过30000字节才会进行打包
+    minRemainingSize: 0,
+    maxSize: 0,
+    minChunks: 1, // 被chunk引用次数大于等于1，会根据cacheGroups拆分成一个文件（chunk）
+    maxAsyncRequests: 6, // 最多分割6个文件
+    maxInitialRequests: 4, // 入口文件引入的库最多分割4个文件
+    automaticNameDelimiter: '~', // 代码连接符
+    automaticNameMaxLength: 30,
+    cacheGroups: { // 拆分规则
+      vendors: {
+        test: /[\\/]node_modules[\\/]/, // 对node_modules中的文件进行拆分
+        priority: -10 // 优先级，如果找不到符合要求的规则，会根据优先级
+      },
+      default: {
+        minChunks: 2, // 最少被引用两次，才进行拆分
+        priority: -20,
+        reuseExistingChunk: true // 已经拆分过的共用代码，直接使用
+      }
+    }
+  }
+}
+```
+
+异步加载方式
+
+可以做懒加载，只有在用到的时候才会进行加载，做首屏优化，路由懒加载等
+
+```bash
+npm install @babel/plugin-syntax-dynamic-import -D
+```
+
+引入 babel 预编译文件,在 `.babelrc` 文件中添加下面代码
+
+```json
+"plugins": [
+  "@babel/plugin-syntax-dynamic-import"
+]
+```
+
+异步加载`lodash`，`webpackChunkName:"lodash"`  定义拆分后文件的名字，提高页面代码利用率，从而提高首屏家载速度（将需要操作才加载的代码拆分，已异步的方式加载）
+
+```js
+function getComponent () {
+  return import(/* webpackChunkName:"lodash" */'lodash').then(({ default: _ }) => {
+    let element = document.createElement('div')
+    element.innerHTML = _.join(['a', 'd'], '-')
+    return element
+  })
+}
+
+// async await 方式
+async function getComponent () {
+  const { default: _ } = await import(/* webpackChunkName: "lodash" */'lodash')
+  let element = document.createElement('div')
+  element.innerHTML = _.join(['a', 'd'], '-')
+  return element
+}
+
+document.addEventListener('click', () => {
+  getComponent().then(e => {
+    document.body.appendChild(e)
+  })
+})
+
+```
+
+因为上面代码大部分配置都是默认的，我们并不需要修改，只需要需改chunks
+
+```javascript
+optimization: {
+  splitChunks: {
+    chunks: 'all' // 同步异步方式都进行拆分
+  }
+}
+```
+
+通过使用异步来实现代码的加载，提高代码的利用率，但是这样每次加载新的页面速度会变慢，所以通过设置 webpackPrefetch: true  当页面带宽有剩余时，自动加载，提高新页面打开速度
+
+```javascript
+// click.js
+function handleClick () {
+  const element = document.createElement('div')
+  element.innerHTML = 'sync loading'
+  document.body.appendChild(element)
+}
+
+export default handleClick
+```
+
+```js
+// index.js
+document.addEventListener('click', () => {
+  import(/* webpackPrefetch: true */'./click.js').then(({default: func}) => {
+    func()
+  })
+})
 ```
 
 
@@ -209,7 +407,7 @@ loader 打包是从下到上逐层调用 loader
 {
   test: /\.scss$/,
   use: [
-    'style-loader', // 添加到head顶部
+    'style-loader', // css in js
     {
       loader: 'css-loader', // 打包css
       options: {
@@ -229,7 +427,7 @@ loader 打包是从下到上逐层调用 loader
 
 插件，扩展 webpack 的功能
 
-### 配置HTML模版
+### HTML模版
 
 配置html模版，并将打包后的js引入到模版中
 
@@ -253,7 +451,7 @@ plugins: [
 ]
 ```
 
-### 添加热更新 HMR
+### 热更新 HMR
 
 HMR只做修改内容部分的更新，而不是通过刷新页面达到更新，可以大大提高开发效率
 
@@ -286,6 +484,83 @@ if (module.hot) { // 页面重新渲染时触发
 ```
 
 > 原因是 style-loade 中实现了CSS文件中类似的替换，vue-loader 中实现了 Vue 中类似的替换
+
+### CSS代码拆分和压缩
+
+将css代码拆分打包到css文件中
+
+```bash
+npm install mini-css-extract-plugin -D
+```
+
+css代码压缩
+
+```bash
+npm install optimize-css-assets-webpack-plugin -D
+```
+
+js代码压缩
+
+```bash
+npm install terser-webpack-plugin -D
+```
+
+常用配置
+
+```javascript
+const TerserJSPlugin = require('terser-webpack-plugin')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin')
+
+module: {
+  rules: [
+    {
+      test: /\.scss$/,
+      use: [
+        MiniCssExtractPlugin.loader, // 替换style-loader
+        {
+          loader: 'css-loader', // 打包css
+          options: {
+            importLoaders: 2, // 在调用当前loader(CSS)之前，要调用两个loader(postcss 和 sass)
+            modules: true // 模块化打包css
+          }
+        },
+        'postcss-loader', // 支持插件
+        'sass-loader' // 打包sass
+      ]
+    }
+  ]
+},
+plugins: [
+  new MiniCssExtractPlugin({ // 打包css
+    filename: '[name].css',
+    chunkFilename: '[id].css' // 间接引入命名方式
+  })
+],
+optimization: {
+  minimizer: [
+    new TerserJSPlugin({}),
+    new OptimizeCSSAssetsPlugin({})
+  ]
+}
+```
+
+> 如果使用了 tree shaking，在 package.json 中添加忽略
+
+### 自动引入
+
+使用 jquery 等库文件要在每个 js 中都引用非常麻烦，可以通过webpack的原生插件，实现自动引入
+
+```js
+plugins: [
+  new webpack.ProvidePlugin({
+    $: 'jQuery', // 自动引入库 使用$时自动引入jquery
+    _join: ['lodash', 'join'] //自动引入库中的方法 使用_join时自动引入lodash中的join
+  })
+]
+```
+
+
 
 ## babel
 
@@ -375,435 +650,58 @@ npm install @babel/runtime -S
 
 
 
-## React
+## ESLint
+
+安装`eslint`
 
 ```bash
-npm install react react-dom --save
+npm install eslint eslint-loader -D
 ```
 
-安装react
+`eslint` 文件初始化
 
 ```bash
-npm install --save-dev @babel/preset-react
+npx eslint --init
 ```
 
-安装`preset-react`解析react
+对js文件进行检查，但是对降低打包速度
 
-```json
-{
-  "presets": [
-    [
-      "@babel/preset-env",
-      {
-        "useBuiltIns": "usage",
-        "corejs": 3
-      }
-    ],
-    [
-      "@babel/preset-react"
-    ]
-  ]
-}
-```
-
-
-
-## tree shaking
-
-只支持ES Module(静态)，只打包用到的文件，如：引入文件 math.js ，但是只使用了其中一个方法，默认情况下会全部都进行打包，但是配置了 tree shaking 只会打包用到的文件
-
-**环境配置**
-
-在 webpack.common.js 文件中添加下面代码
-
-```javascript
-optimization: { // 开发环境可以省略不写，会默认添加
-  usedExports: true
-}
-```
-
-**注:** 开发环境下还是会全部进行打包，但是会标记用到了哪些，生产环境则只打包用到的
-
-**生产环境配置**
-
-只需要指定 `mode: 'production'`  即可
-
-**配置忽略**
-
-如果要打包的文件都会进行输出，在 `package.json` 文件中添加 `"sideEffects":  false`
-
-```json
-"sideEffects":  false // 全部需要检测，没有导出的文件会被忽略
-
-"sideEffects": ["@babel/polly-fill","*.css"] // 配置忽略,不进行检测
-```
-
-
-
-## 开发和生产环境代码分离
-
-```bash
-npm install webpack-merge -D
-```
-
-用于通用配置
-
-将 webpack.dev.js 分解成 webpack.dev.js 和 webpack.prod.js 两个配置文件，用于打包不同环境的配置，
-
-因为很多配置既要在开发环境用到也要在生成环境中用到，所以将共有属性抽取出来，建一个 webpack.common.js
-
-```javascript
-const merge = require('webpack-merge') // 用于通用配置
-const commonConfig = require('./webpack.common') // 引入通用文件
-
-const devConfig = {
-    /*...*/
-}
-
-module.exports = merge(commonConfig, devConfig) // 导出配置文件
-```
-
-在 package.json 中更改开发和生产环境的命令
-
-```json
-"dev": "webpack-dev-server --config build/webpack.dev.js",
-"build": "webpack --config build/webpack.prod.js"
-```
-
-
-
-## 代码分割
-
-将代码都打包到一个文件，首屏会很慢，所以利用浏览器可以同时加载多个 JS 文件，将代码分割
-
-**同步方式**
-
-- 自己实现
-
-将类库代码如 `lodash` 和业务代码进行拆分，在`lodash`文件中将其挂载到window上，实现全局访问，这样业务代码更新时，可以通过缓存来加载 `lodash` 只请求更新的业务代码
-
-- 通过webpack自动实现代码分割
-
-  根据代码进行自动分割
-
-  ```js
-  optimization: {
-    splitChunks: {
-      chunks: 'all' // 默认为 async
-    }
-  }
-  ```
-
-**异步方式**
-
-可以做懒加载，只有在用到的时候才会进行加载(首屏优化，进行代码分割，路由懒加载，用到的时候才会加载)
-
-```bash
-npm install @babel/plugin-syntax-dynamic-import -D
-```
-
-引入 babel 预编译文件,在 `.babelrc` 文件中添加下面代码
-
-```json
-"plugins": [
-  "@babel/plugin-syntax-dynamic-import"
-]
-```
-
-异步加载`lodash`
+另一种方法是提交代码时做eslint检查，不通过拒绝提交代码，牺牲交互友好性，提高打包速度
 
 ```js
-function getComponent () {
-  return import('lodash').then(({ default: _ }) => {
-    let element = document.createElement('div')
-    element.innerHTML = _.join(['Hello', 'webpack'], '-')
-    return element
-  })
-}
-
-getComponent().then(element => {
-  document.body.append(element)
-})
-```
-
-`webpackChunkName:"lodash"`  定义打包后文件的名字
-
-```javascript
-function getComponent () {
-  return import(/* webpackChunkName:"lodash" */'lodash').then(({ default: _ }) => {
-    ...
-  })
-}
-```
-
-webpack 中添加如下代码
-
-```javascript
-optimization: {
-  splitChunks: { // 代码分割
-    chunks: 'all', // initial同步 async异步 all全部
-    minSize: 30000, // 超过30000字节才会进行打包
-    minChunks: 1, // 打包后被chunk引用次数大于等于1，会单独打包成一个文件
-    maxAsyncRequests: 5, // 最多分割5个文件
-    maxInitialRequests: 3, // 入口文件引入的库最多分割3个文件
-    automaticNameDelimiter: '~', // 代码连接符
-    name: true, // vendors 和 default 起的名字有效
-    cacheGroups: {
-      vendors: {
-        test: /[\\/]node_modules[\\/]/, // 对node_modules中的文件进行打包
-        priority: -10, // 优先级
-        name: "vendors" // 将所有符合要求的文件打包成一个vendors文件
-      },
-      default: { // 对不在node_modules中的文件进行打包
-        priority: -20,
-        reuseExistingChunk: true, // 忽略已经打包过的共用代码
-        name: 'common'
-      }
-    }
-  }
-}
-```
-
-因为上面代码大部分配置都是默认的，我们并不需要修改，所以可以省略，由 webpack 来加载默认配置
-
-```javascript
-optimization: {
-  splitChunks: {
-    chunks: 'all' // 默认为 async
-  }
-}
-```
-
-通过使用异步来实现代码的加载，提高代码的利用率，但是这样每次加载新的页面速度会变慢，所以通过设置 webpackPrefetch: true  当页面带宽有剩余时，自动加载，提高性能
-
-```javascript
-document.addEventListener('click', () => {
-  import(/* webpackPrefetch: true */ './click.js').then(({default: func}) => {
-    func()
-  })
-})
-```
-
-指定入口文件拆分后名字格式
-
-```js
-output: { // 出口文件
-  chunkFilename: '[name].chunk.js', // 入口文件拆分后名字格式
-}
-```
-
-## webpack打包分析
-
-生成打包的`json`文件
-
-```bash
-webpack --profile --json > stats.json
-```
-
-将json文件，传入[分析网站](http://webpack.github.io/analyse/)获取分析结果
-
-
-## CSS代码拆分
-
-将css代码拆分打包到css文件中
-
-```bash
-npm install mini-css-extract-plugin -D
-```
-
-```javascript
-const MiniCssExtractPlugin = require('mini-css-extract-plugin')
-
-module: {
-  rules: [
-    {
-      test: /\.css$/,
-      use: [
-        MiniCssExtractPlugin.loader, // 替换style-loader
-        'css-loader',
-        'postcss-loader'
-      ]
-    },
-    {
-      test: /\.scss$/,
-      use: [
-        MiniCssExtractPlugin.loader, // 替换style-loader
-        {
-          loader: 'css-loader', // 打包css
-          options: {
-            importLoaders: 2, // 在调用当前loader(CSS)之前，要调用两个loader(postcss 和 sass)
-            modules: true // 模块化打包css
-          }
-        },
-        'postcss-loader', // 支持插件
-        'sass-loader' // 打包sass
-      ]
-    }
-  ]
-},
-plugins: [
-  new MiniCssExtractPlugin({ // 打包css
-    filename: '[name].css',
-    chunkFilename: '[id].css'
-  })
-]
-```
-
-```bash
-npm install optimize-css-assets-webpack-plugin -D
-```
-
-添加css代码压缩
-
-```javascript
-const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin')
-
-optimization: {
-  minimizer: [new OptimizeCSSAssetsPlugin({})] // css代码压缩
-}
-```
-
-注：如果使用了 tree shaking，在 package.json 中添加忽略
-
-```json
-"sideEffects": [
-  "@babel/polly-fill",
-  "*.css"
-],
-```
-
-
-
-## 配置 hash 用于缓存
-
-代码上线后，如果更改代码内容，但是文件名不变的话，浏览器会从缓存中将老版本的文件取出，这就头疼了，还好 webpack 提拱了解决办法
-
-```javascript
-output: {
-  filename: '[name].[contenthash].js', // 输出文件名使用hash
-  chunkFilename: '[name].[contenthash].js' // 通过html中js引入的js
-}
-```
-
-这样每个文件都有了一个独特的 hash 值，如果我们改变文件内容 hash 会改变，否则不变
-
-CSS 也是一样
-
-```javascript
-plugins: [
-  new MiniCssExtractPlugin({ // 打包css
-    filename: '[name].[contenthash].css', // 配置hash
-    chunkFilename: '[id].[contenthash].css'
-  })
-]
-```
-
-**注：**webpack 老版本可能处理起 hash 会有问题，所以添加下面代码，将hash管理单独成一个文件就ok了，**新版本无视**
-
-```javascript
-optimization: {
-  runtimeChunk: { // 将hash关联分离出来
-    name: 'runtime'
-  }
-}
-```
-
-
-
-## 自动引入
-
-使用 jquery 等库文件要在每个 js 中都引用非常麻烦，可以通过配置，自动引入
-
-```js
-plugins: [
-  new webpack.ProvidePlugin({
-    $: 'jQuery', // 自动引入jquery
-    _join: ['lodash', 'join'] // 使用_join时自动引入lodash中的join
-  })
-]
-```
-
-**指定 this 的 loader**
-
-每个js文件的this默认执行自己，可以通过imports-loader修改默认this，但也可以通过call来指定this
-
-```bash
-npm install imports-loader -D
-```
-
-```javascript
 {
   test: /\.js$/,
-    exclude: /node_modules/, // 对node_modules中的JS进行忽略
-    use: [{
-      loader: 'babel-loader'
-    }, {
-      loader: 'imports-loader?this=>window' // 将默认this改为window
-    }]
+  exclude: /node_modules/, // 对node_modules中的JS进行忽略
+  use: ['babel-loader', 'eslint-loader'] // 先执行eslint 在执行babel
 }
 ```
 
-## 另一种环境配置的方法
-
-在`webpack.common.js`中根据环境进行输出
-
-```js
-module.exports = () => {
-  if (process.env.NODE_ENV === 'production') {
-    return merge(commonConfig, prodConfig)
-  } else {
-    return merge(commonConfig, devConfig)
-  }
-}
-```
-
-## 打包一个library
-
-```js
-output: {
-  library: "MyLibrary", // 可以通过script 方式引入
-  libraryTarget: "umd", // 支持import require 等引入方式
-},
-externals: 'lodash' // 将loadash 库忽略，不打包进项目中
-```
-
-## PWA
+使用babel-eslint做解析器
 
 ```bash
-npm install workbox-webpack-plugin -D
+npm install babel-eslint -D
 ```
 
-安装谷歌plugin
-
 ```js
-const WorkboxPlugin = require('workbox-webpack-plugin') // PWA
-
-plugins: [
-  new WorkboxPlugin.GenerateSW({
-  	clientsClaim: true,
-  	skipWaiting: true
-  })
-]
-```
-
-配置PWA
-
-```js
-// index.js
-if ('serviceWorker' in navigator) { // 是否支持serviceWorker
-  window.addEventListener('load', () => {
-    // 打包后生成service-worker.js
-    navigator.serviceWorker.register('./service-worker.js')
-    .then(registration => { // 开启成功，将页面缓存
-      console.log('service-worker registed')
-    }).catch(error => {
-      console.log('service-worker registed error')
-    })
-  })
+// .eslintrc.js
+{
+  parser: 'babel-eslint'
 }
 ```
 
-业务应用
+将eslint 错误显示在页面上
+
+```js
+devServer: {
+  overlay: true,
+}
+```
+
+`.editorconfig`: 使用文件中配置的规则，优先级会高于编译器的默认配置
+
+`.eslintignore`：配置eslint忽略文件检查目录
+
+
 
 ## TypeScript
 
@@ -814,7 +712,7 @@ npm install ts-loader typescript -D
 ```js
 module: {
   rules: [{
-    test: /\.tsx/,
+    test: /\.tsx$/,
     use: 'ts-loader',
     exclude: /node_modules/
   }]
@@ -846,50 +744,40 @@ npm install @types/lodash -D
 import * as _ from 'lodash'
 ```
 
-## EsLint
+
+
+## React
 
 ```bash
-npm install eslint eslint-lader -D
+npm install react react-dom -S
 ```
 
-安装`eslint`
+安装react
 
 ```bash
-npx eslint --init
+npm install @babel/preset-react -D
 ```
 
-`eslint` 文件初始化
+安装`preset-react`解析react
 
-选择 `standard` 的规范
-
-```js
+```json
 {
-  test: /\.js$/,
-  exclude: /node_modules/, // 对node_modules中的JS进行忽略
-  use: ['babel-loader', 'eslint-loader'] // 先执行eslint 在执行babel
+  "presets": [
+    [
+      "@babel/preset-env",
+      {
+        "useBuiltIns": "usage",
+        "corejs": 3
+      }
+    ],
+    [
+      "@babel/preset-react"
+    ]
+  ]
 }
 ```
 
-```bash
-npm install babel-eslint -D
-```
 
-```js
-// .eslintrc.js
-parserOptions: { // 使用babel-eslint 做编译器
-  parser: 'babel-eslint'
-}
-```
-
-```js
-devServer: {
-  overlay: true, // 将eslint 错误显示在页面上
-}
-```
-
-设置`.editorconfig`
-
-优先级会高于编译器的默认配置，如果无效将编译器的查找文件删掉，再次生成就会读取了
 
 ## 性能优化
 
@@ -897,3 +785,70 @@ devServer: {
 2. 去除不必要的`plugins`
 3. 减少`resolve`中不必要的配置，如：`extensions`后缀的数量不要过多
 4. 将使用到的第三方库文件单独打包，使用`add-asset-html-webpack-plugin`将第三方库文件添加到html模板文件中，使用`webpack`中的`DllPlugin` 生成第三方代码库的分析文件，使用`webpack`中的`DllReferencePlugin`执行分析文件，如果已经打包过，则直接使用打包的库文件，这样只会打包一次，提升打包速度
+
+
+
+## webpack打包分析
+
+生成打包的`json`文件
+
+```bash
+webpack --profile --json > stats.json
+```
+
+将json文件，传入[分析网站](http://webpack.github.io/analyse/)获取分析结果
+
+
+
+## 打包一个library
+
+```js
+output: {
+  /*...*/
+  library: "MyLibrary", // 可以通过script 方式引入
+  libraryTarget: "umd", // 支持import require 等引入方式
+},
+externals: 'lodash' // 将loadash 库忽略，不打包进项目中
+```
+
+
+
+## PWA
+
+安装谷歌plugin
+
+```bash
+npm install workbox-webpack-plugin -D
+```
+
+配置PWA
+
+```js
+const WorkboxPlugin = require('workbox-webpack-plugin') // PWA
+
+plugins: [
+  new WorkboxPlugin.GenerateSW({
+  	clientsClaim: true,
+  	skipWaiting: true
+  })
+]
+```
+
+业务应用
+
+```js
+// index.js
+if ('serviceWorker' in navigator) { // 是否支持serviceWorker
+  window.addEventListener('load', () => {
+    // 打包后生成service-worker.js
+    navigator.serviceWorker.register('./service-worker.js')
+    .then(registration => { // 开启成功，将页面缓存
+      console.log('service-worker registed')
+    }).catch(error => {
+      console.log('service-worker registed error')
+    })
+  })
+}
+```
+
+4. 
