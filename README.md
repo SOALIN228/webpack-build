@@ -721,7 +721,7 @@ module: {
 
 还需要配置`tsconfig.json` 才可以正常使用
 
-```json
+```js
 {
   "compilerOptions": {
     "outDir": "./dist", // 输出文件路径
@@ -781,10 +781,16 @@ npm install @babel/preset-react -D
 
 ## 性能优化
 
-1. 使用`exclude`和`include`,减少`loader`检查的代码数量和嵌套层数
-2. 去除不必要的`plugins`
-3. 减少`resolve`中不必要的配置，如：`extensions`后缀的数量不要过多
-4. 将使用到的第三方库文件单独打包，使用`add-asset-html-webpack-plugin`将第三方库文件添加到html模板文件中，使用`webpack`中的`DllPlugin` 生成第三方代码库的分析文件，使用`webpack`中的`DllReferencePlugin`执行分析文件，如果已经打包过，则直接使用打包的库文件，这样只会打包一次，提升打包速度
+1. 使用新版的node、npm、yarn，提高打包速度
+2. loader 中使用`exclude`和`include`,减少检查的代码数量和嵌套层数
+3. plugins 中去除不必要的插件，提高打包速度
+4. resolve 中配置不要过多，如：extensions 只配置逻辑文件 js、 jsx、 vue
+5. 将使用到的第三方库文件单独打包，使用`add-asset-html-webpack-plugin`将打包后的第三方库文件添加到html模版中，使用`webpack`中的`DllPlugin` 生成第三方库的分析文件，使用`webpack`中的`DllReferencePlugin`执行分析文件，根据分析文件的映射结果实现，如果已经单独打包过，则直接使用打包的库文件，否则进行打包，这样就可以只打包一次库代码，从而提升打包速度
+6. 控制包的大小
+7. webpack 默认使用node的单进程打包，借助thread-loader等使用多进程打包
+8. 根据项目配置合理的source Map
+9. devServer 打包到内存中，速度更快
+10. 开发环境中去除无用的插件
 
 
 
