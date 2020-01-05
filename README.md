@@ -849,5 +849,3 @@ if ('serviceWorker' in navigator) { // 是否支持serviceWorker
   })
 }
 ```
-
-4. 
