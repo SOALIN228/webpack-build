@@ -1,12 +1,20 @@
 const path = require('path')
 const fs = require('fs')
 const webpack = require('webpack')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
 const AddAssetHtmlPlugin = require('add-asset-html-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 
 const makePlugins = () => {
   const plugins = [
+    new CopyWebpackPlugin([
+      {
+        from: path.resolve(__dirname, '../static'),
+        to: 'static',
+        ignore: ['.*']
+      }
+    ]),
     new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
       template: 'src/index.html'
@@ -45,27 +53,43 @@ const configs = {
     rules: [
       {
         test: /\.jsx?$/,
+        include: [
+          path.resolve(__dirname, "../src"),
+          path.resolve(__dirname, "../test")
+        ],
         exclude: /node_modules/,
         use: ['babel-loader']
       },
       {
-        test: /\.(jpe?g|png|gif)$/,
+        test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
         use: [{
           loader: 'url-loader',
           options: {
             name: '[name]_[hash].[ext]',
-            outputPath: 'images/',
-            limit: 10240
+            outputPath: 'img/',
+            limit: 10000
           }
         }]
       },
       {
-        test: /\.(woff2?|eot|ttf|otf|svg)$/,
+        test: /\.(mp4|webm|ogg|mp3|wav|flac|aac)(\?.*)?$/,
         use: [{
-          loader: 'file-loader',
+          loader: 'url-loader',
           options: {
             name: '[name]_[hash].[ext]',
-            outputPath: 'fonts/'
+            outputPath: 'media/',
+            limit: 10000
+          }
+        }]
+      },
+      {
+        test: /\.(woff2?|eot|ttf|otf|svg)(\?.*)?$/,
+        use: [{
+          loader: 'url-loader',
+          options: {
+            name: '[name]_[hash].[ext]',
+            outputPath: 'fonts/',
+            limit: 10000
           }
         }]
       }

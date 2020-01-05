@@ -323,19 +323,20 @@ document.addEventListener('click', () => {
 ### 打包字体
 
 ```bash
-npm install file-loader -D
+npm install file-loader url-loader -D
 ```
 
-打包配置
+url-loader 依赖 file-loader ，使用方法基本相同，区别是 url-loader 可以指定当文件小于设置参数时，使用base64打包
 
 ```javascript
 {
-  test: /\.(woff2?|eot|ttf|otf|svg)$/, // 字体格式
+  test: /\.(woff2?|eot|ttf|otf|svg)(\?.*)?$/, // 字体格式
   use: [{
-    loader: 'file-loader',
+    loader: 'url-loader',
     options: {
       name: '[name]_[hash].[ext]',
-      outputPath: 'fonts/'
+      outputPath: 'fonts/',
+      limit: 10000
     }
   }]
 }
@@ -343,27 +344,19 @@ npm install file-loader -D
 
 ### 打包图片
 
-```bash
-npm install url-loader -D
-```
-
-url-loader 和 file-loader 功能相似，区别是 url-loader 可以指定当图片小于设置参数时，使用base64打包
-
 ```javascript
 {
-  test: /\.(jpe?g|png|gif)$/, // 图片格式
+  test: /\.(png|jpe?g|gif|svg)(\?.*)?$/, // 图片格式
   use: [{
     loader: 'url-loader', // 使用url-loader打包图片
     options: {
       name: '[name]_[hash].[ext]', // 配置打包后的名字 ext为文件扩展名
-      outputPath: 'images/', // 输出路径
-      limit: 20480 // 图片大于20kb使用base64进行打包，减少http请求
+      outputPath: 'img/', // 输出路径
+      limit: 10000 // 图片大于1000b使用base64进行打包，减少http请求
     }
   }]
 }
 ```
-
-> url-loader 依赖 file-loader
 
 ### 打包CSS
 
