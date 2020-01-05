@@ -314,6 +314,19 @@ document.addEventListener('click', () => {
 
 
 
+## resolve
+
+```js
+resolve: {
+  extensions: ['.js', '.jsx'], // 安装设置进行文件尾缀匹配
+  alias: { // 全局变量
+    '@': path.resolve(__dirname, '../src')
+  }
+}
+```
+
+
+
 ## Loader
 
 在 webpack.dev.js 文件 module 中配置
@@ -551,6 +564,24 @@ plugins: [
     _join: ['lodash', 'join'] //自动引入库中的方法 使用_join时自动引入lodash中的join
   })
 ]
+```
+
+### 目录拷贝
+
+将单个文件或整个目录复制到构建目录
+
+```bash
+npm install copy-webpack-plugin -D
+```
+
+```js
+new CopyWebpackPlugin([
+  {
+    from: path.resolve(__dirname, '../static'),
+    to: 'static',
+    ignore: ['.*']
+  }
+])
 ```
 
 
