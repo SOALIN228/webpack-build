@@ -1,5 +1,7 @@
 # webpack
 
+[安装该npm包](https://www.npmjs.com/package/generator-no-cli)
+
 学习 `webpack`笔记，但是因为webpack生态非常丰富，只记录一些常用配置，具体以**文档为准**
 
 `webpack` 是一个模块打包工具
